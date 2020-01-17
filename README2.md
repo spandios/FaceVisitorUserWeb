@@ -8,8 +8,7 @@ Face Visitor 고객용
 
 All 3 files are runnable like this:
 ```
-$ python3 camera.py
-$ python3 face_recog.py
+
 $ python3 live_streaming.py
 ```
 
