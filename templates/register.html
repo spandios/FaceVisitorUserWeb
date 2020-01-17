@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FaceVisitor</title>
+    <link href="(( url_for('static', filename='css/login.css') ))" rel="stylesheet">
+    <link href="(( url_for('static', filename='css/common.css') ))" rel="stylesheet">
+    <link href="(( url_for('static', filename='css/register.css') ))" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+<div class="wrapper" id="app">
+    <div class="header">
+        <!-- <div class="wrap_head"> 제거 -->
+        <div class="inner">
+            <h1 class="logo"><a href="/"><span class="blind">FACE VISITOR</span></a></h1>
+            <div class="gnb">
+                <ul class="service_menu">
+                    <li><a class="link" href="">홈</a></li>
+                    <li><a class="link" href="">장바구니</a></li>
+                </ul>
+                <div class="my_menu">
+                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
+                        <div class="layer_search">
+                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
+                        </div>
+                    </div>
+                    <div class="wrap_layer"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
+                        <div class="layer_menu">
+                            <ul class="menu">
+                                <li><a href="##">주문내역</a></li>
+                                <li><a href="##">찜목록</a></li>
+                                <li><a href="##">문의내역</a></li>
+                                <li><a href="##">스타일 문답</a></li>
+                                <li><a href="##">내정보</a></li>
+                            </ul>
+                            <a class="logout" href="#">로그아웃</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2 login">
+        <!--       서비스 시작하기 -->
+
+        <div class="main-content">
+            <h3 class="page-title">고객 정보</h3>
+            <p class="sub_text">로그인에 사용할 이메일과 비밀번호를 입력해주세요.</p>
+            <p class="sub_text">얼굴인식 여부 : {{isFaceDetected}}</p>
+            <form @submit.prevent="register" action="" method="post">
+                <div class="text-center">
+                    <img id="bg" src="(( url_for('video_feed') ))" style="width:300px; height:300px;">
+                </div>
+                <div class="input-wrapper">
+                    <input class="input-field" name="name" placeholder="이메일" type="text" v-model="email" value="">
+                </div>
+
+                <div class="input-wrapper">
+                    <input class="input-field" name="name" placeholder="이름" type="text" v-model="name" value="">
+                </div>
+
+                <div class="input-wrapper">
+                    <input class="input-field" class="form-control" name="password"
+                           placeholder="비밀번호"
+                           type="password"
+                           v-model="password">
+                </div>
+
+                <div class="input-wrapper">
+                    <input class="input-field" placeholder="비밀번호 확인" style="ime-mode:inactive" type="password"
+                           v-model="passwordRepeat">
+                </div>
+
+                <div class="input-wrapper phone">
+                    <input class="input-field" maxlength="13" placeholder="휴대번호" type="text" v-model="phoneNumber">
+                </div>
+
+                <div class="input-wrapper">
+                    <!--          <button type="submit" class="btn_submit" @click="requestVerifyRecaptcha">다음단계 &gt;</button>-->
+                    <button class="btn_submit" type="submit">회웝가입</button>
+                </div>
+                <div class="foot-note">
+                    FaceVisitor의 <a href="/pages/terms-of-use">이용약관</a>과
+                    <a href="/pages/privacy-policy">개인정보 취급방침</a>에 동의합니다.
+                </div>
+                <div class="new-customer">
+                    <p>이미 회원이신가요?</p>
+                    <div class="input-wrapper">
+                        <a class="input-field" href="/login">로그인 하기</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="inner">
+            <div class="sns_menu">
+                <a class="facebook" href="##"><span class="blind">Facebook</span></a>
+                <a class="instagram" href="##"><span class="blind">Instagram</span></a>
+            </div>
+            <div class="etc_menu">
+                <a href="##">ABOUT US</a>
+                <a href="##">FAQ</a>
+            </div>
+            <div class="copyright">
+                <p class="txt">© 2020 FaceVisitor. All rights reserved.</p>
+                <a href="#">이용약관</a>
+                <a href="#">개인정보 처리방침</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            email: '',
+            password: '',
+            passwordRepeat: '',
+            name: '',
+            phoneNumber: '',
+            isFaceDetected: false,
+        },
+        created() {
+            setInterval(async () => {
+                var {data} = await axios.get('http://localhost:5000/is_face_detected');
+                this.isFaceDetected = data.is_face_detected;
+            }, 9500);
+        },
+        methods: {
+            async register() {
+                // if(!this.isFaceDetected){
+                //     alert("얼굴을 인식해주세요");
+                //     return;
+                // }
+                var user = {
+                    email: this.email,
+                    password: this.password,
+                    passwordRepeat: this.passwordRepeat,
+                    name: this.name,
+                    phone: this.phoneNumber,
+                };
+                try {
+
+                    var faceJoinResponse = await axios.post('http://localhost:5000/auth/join', {user});
+                    Swal.fire({
+                        text: '가입되었습니다!!',
+                        icon: 'success',
+                    });
+
+                } catch (err) {
+                    Swal.fire({
+                        text: "가입에 실패했습니다. 다시 시도해주세요.",
+                        icon: 'error',
+                    });
+                }
+
+
+            }
+        }
+    });
+</script>

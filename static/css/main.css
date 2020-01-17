@@ -1,0 +1,384 @@
+@charset "utf-8";
+
+.visual {
+    position: relative;
+    height: 416px;
+    color: #4a4a4a;
+    background-color: #f6f6f6;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: cover
+}
+
+.visual .desc_info {
+    overflow: hidden;
+    padding-top: 117px;
+    text-align: center
+}
+
+.visual .desc_info .tit_desc {
+    font-weight: 600;
+    font-family: 'Spoqa Han Sans', sans-serif;
+    font-size: 40px;
+    line-height: 54px;
+    letter-spacing: 1px
+}
+
+.visual .desc_info .tit_desc > span {
+    display: block;
+    font-weight: 200;
+    font-size: 20px;
+    line-height: 27px
+}
+
+.visual .desc_info .txt_desc {
+    margin: 0 auto;
+    padding-top: 20px;
+    max-width: 704px;
+    font-size: 16px;
+    line-height: 24px
+}
+
+.main .visual {
+    height: 544px;
+    color: #fff;
+    background-image: url('../images/main-banner.png')
+}
+
+.main .visual .desc_info {
+    padding-top: 272px;
+    width: 600px;
+    height: 228px;
+    text-align: left
+}
+
+.main .visual .desc_info .tit_desc {
+    font-size: 36px
+}
+
+.main .section_title {
+    width: 1104px
+}
+
+.section_collection {
+    position: relative;
+    padding: 8px 0 8px
+}
+
+.section_collection .list_collection {
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+.section_collection .list_collection:after {
+    display: table;
+    clear: both;
+    content: "";
+    table-layout: fixed
+}
+
+.section_collection .list_collection li {
+    float: left;
+    width: 33.33%;
+}
+
+.section_collection .list_collection .link_box {
+    display: block;
+    position: relative;
+    margin: 8px
+}
+
+.section_collection .list_collection .timer {
+    position: absolute;
+    top: 23px;
+    right: 23px;
+    min-width: 178px;
+    padding: 11px 19px;
+    height: 50px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 20px;
+    line-height: 29px;
+    background: #00a2e1
+}
+
+.section_collection .list_collection .thumb {
+    display: block
+}
+
+.section_collection .list_collection .thumb > img {
+    display: block;
+    max-width: 100%
+}
+
+.section_collection .list_collection .cont {
+    display: block;
+    overflow: hidden;
+    padding-top: 16px;
+    width: 100%;
+    height: 139px;
+    box-sizing: border-box;
+    color: #4a4a4a
+}
+
+.section_collection .list_collection .cont .tit {
+    display: block;
+    overflow: hidden;
+    font-size: 24px;
+    line-height: 36px;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.section_collection .list_collection .cont .txt {
+    display: block;
+    overflow: hidden;
+    padding-top: 6px;
+    font-size: 18px;
+    line-height: 27px
+}
+
+.section_collection .list_collection .link_all {
+    display: block;
+    position: relative;
+    margin: 8px;
+    background: #2d2d2d
+}
+
+.section_collection .list_collection .link_all > img {
+    display: block;
+    max-width: 100%
+}
+
+.section_collection .list_collection .link_all .inner_box {
+    position: absolute;
+    top: 52px;
+    left: 52px;
+    right: 52px;
+    bottom: 52px;
+    border: 1px solid rgba(255, 255, 255, .5);
+    text-align: center
+}
+
+.section_collection .list_collection .link_all .inner_box .txt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: 40px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold
+}
+
+.tags {
+    overflow: hidden;
+    padding: 10px 5px 20px;
+    max-height: 76px
+}
+
+.tags .link_tag {
+    display: inline-block;
+    margin: 4px 4px 0 0;
+    padding: 3px 13px 5px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 24px;
+    vertical-align: top;
+    background: #4a4a4a
+}
+
+.tags .link_tag.on {
+    background: #00a2e1
+}
+
+.section_rank {
+    padding-top: 60px
+}
+
+.section_article {
+    position: relative;
+    padding: 48px 0 40px
+}
+
+.section_article .list_article {
+    padding: 15px 0 0;
+    width: 1128px
+}
+
+.section_article .list_article li {
+    overflow: hidden;
+    position: relative;
+    float: left;
+    margin: 0 10px 20px;
+    width: 356px;
+    box-sizing: border-box
+}
+
+.section_article .list_article .link_article {
+    display: block;
+    color: #4a4a4a;
+    font-family: 'Spoqa Han Sans', sans-serif;
+    text-decoration: none
+}
+
+.section_article .list_article img {
+    display: block;
+}
+
+.section_article .list_article .tit {
+    display: block;
+    overflow: hidden;
+    margin-top: 16px;
+    font-size: 28px;
+    line-height: 38px;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.section_article .list_article .tit:after {
+    display: block;
+    margin-top: 10px;
+    width: 170px;
+    height: 4px;
+    background: #9b9b9b;
+    content: ""
+}
+
+.section_article .list_article .desc {
+    display: block;
+    overflow: hidden;
+    padding-top: 12px;
+    height: 120px;
+    font-size: 16px;
+    line-height: 24px
+}
+
+.section_article .link_more {
+    position: absolute;
+    top: 29px;
+    right: 8px;
+    color: #00a2e1;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 29px
+}
+
+.visual.top {
+    color: #fff;
+    background-image: url(../images/main_banner2.png)
+}
+
+.section_bg {
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: cover
+}
+
+.section_bg.mid {
+    height: 521px;
+    background-image: url('../images/bg_main_mid2.png')
+}
+
+.section_bg.btm {
+    height: 495px;
+    background-image: url('../images/bg_main_btm.png')
+}
+
+.section_cont {
+    padding: 85px 0 110px;
+    color: #4a4a4a;
+    text-align: center
+}
+
+.section_cont.type2 {
+    padding: 100px 0 120px;
+    background: #f6f6f6
+}
+
+.section_cont .tit_cont {
+    font-size: 40px;
+    font-family: 'Spoqa Han Sans', sans-serif;
+    word-break: break-all
+}
+
+.section_cont .txt_cont {
+    margin: 20px auto 0;
+    max-width: 912px;
+    font-size: 20px;
+    line-height: 27px;
+    font-family: 'Spoqa Han Sans', sans-serif;
+    word-break: break-all
+}
+
+.section_cont .list {
+    overflow: hidden;
+    padding-top: 20px
+}
+
+.section_cont .list li {
+    float: left;
+    width: 33.33%;
+    padding: 30px 60px;
+    box-sizing: border-box;
+    word-break: break-all
+}
+
+.section_cont .list li > img {
+    display: block;
+    margin: 0 auto 35px;
+    height: 123px
+}
+
+.section_cont .list.tree li {
+    position: relative;
+    width: 25%
+}
+
+.section_cont .list.tree li:after {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin-top: -50px;
+    height: 46px;
+    font-size: 32px;
+    line-height: 46px;
+    content: "+"
+}
+
+.section_cont .list.tree li:first-child:after {
+    content: "="
+}
+
+.section_cont .list.tree li:last-child:after {
+    content: none
+}
+
+.section_cont .list_partner {
+    overflow: hidden;
+    padding-top: 60px;
+    font-size: 0;
+    text-align: center
+}
+
+.section_cont .list_partner li {
+    display: inline-block;
+    padding: 18px 8px;
+    width: 168px;
+    vertical-align: top
+}
+
+.section_cont .list_partner li a {
+    display: block
+}
+
+.section_cont .list_partner li img {
+    max-width: 168px;
+    max-height: 80px;
+    vertical-align: top
+}

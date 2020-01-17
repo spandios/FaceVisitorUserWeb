@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title></title>
+    <meta charset="utf-8"/>
+    <meta content="ko-KR" http-equiv="Content-Language"/>
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible"/>
+
+    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../static/css/login.css" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+    <div class="wrapper">
+        <div class="header">
+            <!-- <div class="wrap_head"> 제거 -->
+            <div class="inner">
+                <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
+                <div class="gnb">
+                    <ul class="service_menu">
+                        <li><a class="link" href="##">홈</a></li>
+                        <li><a class="link" href="##">스토어</a></li>
+                        <li><a class="link" href="##">장바구니</a></li>
+                    </ul>
+                    <div class="my_menu">
+                        <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
+                            <button class="btn_search" type="button"><span class="blind">검색</span></button>
+                            <div class="layer_search">
+                                <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
+                            </div>
+                        </div>
+                        <div class="wrap_layer"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                            <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
+                            <div class="layer_menu">
+                                <ul class="menu">
+                                    <li><a href="##">주문내역</a></li>
+                                    <li><a href="##">찜목록</a></li>
+                                    <li><a href="##">문의내역</a></li>
+                                    <li><a href="##">스타일 문답</a></li>
+                                    <li><a href="##">내정보</a></li>
+                                </ul>
+                                <a class="logout" href="#">로그아웃</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container login">
+            <!-- 로그인 -->
+            <div class="main-content">
+                <h2 class="page-title">로그인</h2>
+                <form action="" id="" method="">
+                    <div class="errors">{{errors}}</div>
+                    <div class="input-wrapper">
+                        <input :value="errors" class="input-field" placeholder="비밀번호" type="password">
+                    </div>
+                    <div class="input-wrapper">
+                        <button class="btn_submit" type="submit">로그인</button>
+                    </div>
+                </form>
+                <div class="new-customer">
+                    <p>처음 방문이신가요?</p>
+                    <div class="input-wrapper">
+                        <a class="input-field" href="/register">서비스 시작하기</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="footer">
+            <div class="inner">
+                <div class="sns_menu">
+                    <a class="facebook" href="##"><span class="blind">Facebook</span></a>
+                    <a class="instagram" href="##"><span class="blind">Instagram</span></a>
+                </div>
+                <div class="etc_menu">
+                    <a href="##">ABOUT US</a>
+                    <a href="##">FAQ</a>
+                    <a href="##">CONTACT</a>
+                </div>
+                <div class="copyright">
+                    <p class="txt">© 2019 메종테일러. All rights reserved.</p>
+                    <a href="#">이용약관</a>
+                    <a href="#">개인정보 처리방침</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            password: '',
+            errors: '',
+        },
+        created() {
+
+        },
+        methods: {
+            hello() {
+
+            }
+        }
+    });
+</script>
+
