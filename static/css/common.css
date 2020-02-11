@@ -1,6 +1,5 @@
 @charset "utf-8";
-@import url(https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
-@import url(https://fonts.googleapis.com/css?family=Nunito+Sans:200,400,600,700);
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 
 /* reset */
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, textarea, p, blockquote, th, td, input, select, textarea, button {
@@ -39,11 +38,15 @@ body {
     background: #fff
 }
 
+.container {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
 body, th, td, input, select, textarea, button {
     font-size: 14px;
     line-height: 1.5;
-    font-family: 'Spoqa Han Sans', sans-serif;
-    color: #4a4a4a;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: black;
     outline: 0
 }
 
@@ -111,9 +114,9 @@ img {
 
 .header .logo a:before {
     display: block;
-    width: 230px;
+    width: 280px;
     height: 38px;
-    background: url('../images/logo.png') no-repeat;
+    background: url('../images/logo-facevisitor-white.svg') no-repeat;
     content: ""
 }
 
@@ -306,7 +309,7 @@ img {
     line-height: 24px
 }
 
-.container {
+.container2 {
     min-height: 700px
 }
 
@@ -358,7 +361,7 @@ img {
 .footer .etc_menu {
     overflow: hidden;
     padding: 10px 0 13px;
-    font-family: 'Spoqa Han Sans', sans-serif
+    font-family: 'Noto Sans KR', sans-serif
 }
 
 .footer .etc_menu a {
@@ -430,14 +433,14 @@ img {
     display: block;
     font-weight: 200;
     font-size: 12px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 18px
 }
 
 .wrap_title .tit_category .en {
     display: block;
     font-size: 20px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 27px
 }
 
@@ -507,7 +510,7 @@ img {
 .section_title {
     margin: 0 auto;
     padding: 0 8px;
-    font-size: 36px;
+    font-size: 28px;
     line-height: 54px
 }
 
@@ -525,7 +528,7 @@ img {
 
 .tit_comm .small {
     display: block;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 16px;
     line-height: 22px;
     font-weight: normal
@@ -714,7 +717,7 @@ img {
 .btn_comm {
     display: inline-block;
     height: 52px;
-    border-radius: 5px;
+    border-radius: 10px;
     color: #4a4a4a;
     font-size: 16px;
     font-weight: bold;
@@ -742,14 +745,14 @@ img {
 /* 리스트 */
 .section_list {
     position: relative;
-    padding: 48px 0 40px
+    padding: 32px 0 40px
 }
 
 .section_list .sorting {
     margin-top: -48px
 }
 
-.section_list.history {
+.section_list.historㅠy {
     padding-bottom: 122px
 }
 
@@ -804,7 +807,7 @@ img {
 .section_list .list_comm .cont .tit {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 24px;
     text-overflow: ellipsis;
     white-space: nowrap
@@ -813,7 +816,7 @@ img {
 .section_list .list_comm .cont .txt {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap
@@ -907,7 +910,7 @@ img {
     font-weight: 200;
     font-style: italic;
     font-size: 24px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 60px;
     text-align: center;
     background: rgba(0, 162, 225, 0.8);
@@ -937,7 +940,7 @@ img {
     display: block;
     overflow: hidden;
     font-size: 16px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 24px;
     text-overflow: ellipsis;
     white-space: nowrap
@@ -946,7 +949,7 @@ img {
 .section_rank .list_rank .cont .txt {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     text-overflow: ellipsis;
     white-space: nowrap
 }
@@ -1139,7 +1142,7 @@ img {
     padding-right: 54px;
     font-weight: normal;
     font-size: 16px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 22px;
     text-overflow: ellipsis;
     white-space: nowrap
@@ -1151,7 +1154,7 @@ img {
     padding-right: 54px;
     max-height: 76px;
     font-size: 28px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     line-height: 38px;
     text-overflow: ellipsis;
     white-space: nowrap

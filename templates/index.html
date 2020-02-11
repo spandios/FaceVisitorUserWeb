@@ -1,71 +1,94 @@
 <html>
 <head>
     <title>Face Visitor</title>
-    <style>
-        #bg {
-            width: 400px;
-            height: 400px;
-        }
-
-        #title {
-            margin: 32px;
-            margin-top: 90px;
-            font-size: 60px;
-        }
-
-        #buttons {
-            margin-top: 100px;
-        }
-
-        #btn-signin {
-            font-size: 24px;
-        }
-
-        #btn-login {
-            font-size: 24px;
-        }
-
-    </style>
-    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" rel="stylesheet">
-    <script crossorigin="anonymous"
-            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-            src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-
+    <link href="../static/css/common.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">-->
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+    <!--    <link rel="stylesheet" href="https://unpkg.com/vue2-animate/dist/vue2-animate.min.css"/>-->
+    <!--    <script-->
+    <!--  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"-->
+    <!--  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="-->
+    <!--  crossorigin="anonymous"></script>-->
+    <link href="../static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
 
 </head>
 <body>
 
 <div class="container" id="app">
-    <h1 class="text-center" id="title">Face Visitor </h1>
 
-    <div class="text-center">
-        face : (( url_for('video_feed') ))
-    </div>
-
-    <div class="text-center">
-        <img id="bg" src="(( url_for('video_feed') ))">
-    </div>
-
-    <div class="text-center" id="buttons">
-        <div class="row">
-            <div class="col">
-                <button class="btn btn-primary" id="btn-login" type="button">로그인</button>
-            </div>
-        </div>
-
-        <div class="row mt-3">
-            <div class="col">
-                <button class="btn btn-primary" id="btn-signin" type="button">회원가입</button>
-            </div>
+    <div class="row logo_row animated  fadeIn " style="margin-top: 100px;">
+        <div class="col">
+            <img id="logo" src="../static/images/logo.png" width="262" height="81">
         </div>
     </div>
 
+    <div class="row desc1 animated  fadeIn ">
+        <div class="col" style="font-weight: normal">
+            이제 <span style="font-weight: bold; color:#0658fc">페이스 비지터</span>로<br>
+            매장방문의 색다른 경험을 누려보세요
+        </div>
+    </div>
+
+    <div class="row desc2 text-center animated fadeIn">
+        <div class="col-lg-4">
+            <div class="desc_content">
+                <div class="num">
+                    <img src="static/images/logo_ori.png">
+                </div>
+                <div class="subdesctitle">
+                    얼굴 로그인
+                </div>
+                <div class="subdesc2">
+                    얼굴인식만으로 <br>바로 로그인하실 수 있습니다.
+                    <!--                    내가 관심있던 상품을 분석해 추천받을 수 있어요!-->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="desc_content">
+                <div class="num">
+                    <img src="static/images/payment.png">
+                </div>
+                <div class="subdesctitle">
+                    셀프결제
+                </div>
+                <div class="subdesc2">
+                    상품을 인식하고 직접 빠르게 결제하세요!
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="desc_content">
+                <div class="num">
+                    <img src="static/images/thumb.png" width="64" height="64">
+                </div>
+                <div class="subdesctitle">
+                    개인화된 추천
+                </div>
+                <div class="subdesc2">
+                    실제 고객님이 관심있어하는 상품들을 추천드립니다.
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="start text-center animated slideInUp" id="buttons">
+            <div class="row" :style="{visibility: show ? 'visible' : 'hidden'}">
+                <div class="col">
+                    <div class="join_me">
+                        순식간에 가입할 수 있어요!
+                    </div>
+                    <button id="btn-login" type="button" @click="startFaceVisitor">지금 체험하기</button>
+                </div>
+            </div>
+        </div>
 
 </div>
+
+(% include 'partials/footer.html' %)
 </body>
 </html>
 
@@ -73,20 +96,155 @@
     new Vue({
         el: '#app',
         created() {
-            setInterval(async () => {
-
-            }, 3000);
 
         },
+        data: {
+            show: false
+        },
+        mounted() {
+            const vue = this;
+            setTimeout(function () {
+                vue.show = true;
+            }, 3000)
+        },
         methods: {
-            // async fetchData(){
-            //     var {data} = await axios.get('http://localhost:5000/is_face_detected');
-            //     var face_detected = data.is_face_detected
-            //
-            // }
+            async startFaceVisitor() {
+                Swal.fire("얼굴 인식 중입니다.");
+                Swal.showLoading();
+                axios.get('http://localhost:5000/is_user').then(async result => {
+                    const {data} = result;
+                    console.log(data);
+                    //회원 일 시
+                    if (data) {
+                        Swal.fire({
+                            text: data.username + "님 안녕하세요! 메인으로 이동하겠습니다.",
+                            icon: 'success',
+                        }).then(result => {
+                            if (result.value) {
+                                location.href = "/main";
+                            }
+                        });
+
+
+                        localStorage.setItem("access_token", data.access_token);
+                        localStorage.setItem("refresh_token", data.refresh_token);
+
+                    } else {
+                        Swal.fire({
+                            text: "아직 회원이 아니시군요! 회원가입 페이지로 이동하시겠습니까?",
+                            icon: 'success',
+                            showCancelButton: true,
+                            cancelButtonText: "아니요",
+                            confirmButtonText: "좋아요"
+                        }).then(result => {
+                            if (result.value) {
+                                location.href = "/register";
+                            }
+                        });
+                    }
+                }).catch(err => {
+                    console.log(err.response.data);
+                    if (err.response.status != 500) {
+                        Swal.fire({
+                            text: "얼굴을 찾지 못했습니다",
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire({
+                            text: "서버에러가 발생했습니다.",
+                            icon: 'error',
+                        });
+                    }
+
+                });
+            }
         }
     })
 </script>
+
+<style>
+
+    .logo_row {
+        animation-delay: 0.5s;
+    }
+
+    .desc1 {
+
+        font-size: 32px;
+        font-weight: 300;
+        color: #4a4a4a;
+        margin-top: 50px;
+        font-family: 'Noto Sans KR', sans-serif;
+        animation-delay: 1.5s;
+    }
+
+    .desc2 {
+        margin-top: 64px;
+        animation-delay: 2.5s;
+    }
+
+    .desc_content {
+        margin: 46px;
+    }
+
+    .num {
+        font-size: 20px;
+        font-weight: 300;
+        color: #4a4a4a;
+    }
+
+    .subdesctitle {
+        margin-top: 17px;
+        font-size: 28px;
+        /*font-weight: 300;*/
+        color: #4a4a4a;
+    }
+
+    .subdesc2 {
+        margin-top: 16px;
+        font-size: 18px;
+        font-weight: 300;
+        color: #4a4a4a;
+    }
+
+    .join_me {
+        margin-top: 40px;
+        height: 29px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        color: #f9a11b;
+    }
+
+    #btn-login {
+        margin-top: 18px;
+        width: 70%;
+        height: 80px;
+        border-radius: 14px;
+        background-color: #0658fc;
+        font-size: 28px;
+        font-weight: bold;
+        color: #ffffff;
+
+    }
+    .start{
+          animation-delay: 3s;
+        margin-bottom: 60px;
+    }
+
+    .right-face {
+        margin-top: 12px;
+        height: 24px;
+        font-size: 14px;
+        font-weight: 300;
+        color: #4a4a4a;
+    }
+
+    .container {
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+
+</style>
 
 
 

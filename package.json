@@ -1,7 +1,9 @@
 {
   "name": "face_client",
   "version": "1.0.0",
-  "dependencies": {},
+  "dependencies": {
+    "bootstrap": "^4.4.1"
+  },
   "devDependencies": {
     "sweetalert2": "^9.5.4"
   }

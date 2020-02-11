@@ -18,7 +18,7 @@
 
 .visual .desc_info .tit_desc {
     font-weight: 600;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 40px;
     line-height: 54px;
     letter-spacing: 1px
@@ -223,7 +223,7 @@
 .section_article .list_article .link_article {
     display: block;
     color: #4a4a4a;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     text-decoration: none
 }
 
@@ -303,7 +303,7 @@
 
 .section_cont .tit_cont {
     font-size: 40px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     word-break: break-all
 }
 
@@ -312,7 +312,7 @@
     max-width: 912px;
     font-size: 20px;
     line-height: 27px;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     word-break: break-all
 }
 

@@ -11,47 +11,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 </head>
 <body>
-<div class="wrapper" id="app">
-    <div class="header">
-        <!-- <div class="wrap_head"> 제거 -->
-        <div class="inner">
-            <h1 class="logo"><a href="/"><span class="blind">FACE VISITOR</span></a></h1>
-            <div class="gnb">
-                <ul class="service_menu">
-                    <li><a class="link" href="">홈</a></li>
-                    <li><a class="link" href="">장바구니</a></li>
-                </ul>
-                <div class="my_menu">
-                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
-                        <div class="layer_search">
-                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
-                        </div>
-                    </div>
-                    <div class="wrap_layer"><!-- MY 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
-                        <div class="layer_menu">
-                            <ul class="menu">
-                                <li><a href="##">주문내역</a></li>
-                                <li><a href="##">찜목록</a></li>
-                                <li><a href="##">문의내역</a></li>
-                                <li><a href="##">스타일 문답</a></li>
-                                <li><a href="##">내정보</a></li>
-                            </ul>
-                            <a class="logout" href="#">로그아웃</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="wrapper" id="app" @click="clickMenu">
+    (% include 'partials/header.html' %)
     <div class="container2 login">
-        <!--       서비스 시작하기 -->
-
         <div class="main-content">
             <h3 class="page-title">고객 정보</h3>
             <p class="sub_text">로그인에 사용할 이메일과 비밀번호를 입력해주세요.</p>
-            <p class="sub_text">얼굴인식 여부 : {{isFaceDetected}}</p>
+            <!--            <p class="sub_text">얼굴인식 여부 : {{isFaceDetected}}</p>-->
             <form @submit.prevent="register" action="" method="post">
                 <div class="text-center">
                     <img id="bg" src="(( url_for('video_feed') ))" style="width:300px; height:300px;">
@@ -81,8 +47,7 @@
                 </div>
 
                 <div class="input-wrapper">
-                    <!--          <button type="submit" class="btn_submit" @click="requestVerifyRecaptcha">다음단계 &gt;</button>-->
-                    <button class="btn_submit" type="submit">회웝가입</button>
+                    <button class="btn_submit" type="submit">회원가입</button>
                 </div>
                 <div class="foot-note">
                     FaceVisitor의 <a href="/pages/terms-of-use">이용약관</a>과
@@ -97,23 +62,7 @@
             </form>
         </div>
     </div>
-    <div class="footer">
-        <div class="inner">
-            <div class="sns_menu">
-                <a class="facebook" href="##"><span class="blind">Facebook</span></a>
-                <a class="instagram" href="##"><span class="blind">Instagram</span></a>
-            </div>
-            <div class="etc_menu">
-                <a href="##">ABOUT US</a>
-                <a href="##">FAQ</a>
-            </div>
-            <div class="copyright">
-                <p class="txt">© 2020 FaceVisitor. All rights reserved.</p>
-                <a href="#">이용약관</a>
-                <a href="#">개인정보 처리방침</a>
-            </div>
-        </div>
-    </div>
+    (% include 'partials/footer.html' %)
 </div>
 
 
@@ -130,12 +79,14 @@
             name: '',
             phoneNumber: '',
             isFaceDetected: false,
+            visibleMenu : false,
         },
+
         created() {
-            setInterval(async () => {
-                var {data} = await axios.get('http://localhost:5000/is_face_detected');
-                this.isFaceDetected = data.is_face_detected;
-            }, 9500);
+            // setInterval(async () => {
+            //     var {data} = await axios.get('http://localhost:5000/is_face_detected');
+            //     this.isFaceDetected = data.is_face_detected;
+            // }, 9500);
         },
         methods: {
             async register() {
@@ -143,6 +94,28 @@
                 //     alert("얼굴을 인식해주세요");
                 //     return;
                 // }
+
+                if (!this.email) {
+                    alert("이메일을 확인해주세요");
+                    return;
+                }
+
+                if (!this.password) {
+                    alert("이메일을 확인해주세요");
+                    return
+                }
+
+                if (this.password != this.passwordRepeat) {
+                    alert("패스워드가 일치하지않습니다.");
+                    return;
+                }
+
+                if (!this.name) {
+                    alert("이름을 확인해 주세요.");
+                    return;
+                }
+
+
                 var user = {
                     email: this.email,
                     password: this.password,
@@ -150,8 +123,11 @@
                     name: this.name,
                     phone: this.phoneNumber,
                 };
-                try {
 
+
+                try {
+                    Swal.fire("얼굴 등록 중입니다. ");
+                    Swal.showLoading();
                     var faceJoinResponse = await axios.post('http://localhost:5000/auth/join', {user});
                     Swal.fire({
                         text: '가입되었습니다!!',
@@ -159,13 +135,29 @@
                     });
 
                 } catch (err) {
-                    Swal.fire({
-                        text: "가입에 실패했습니다. 다시 시도해주세요.",
-                        icon: 'error',
-                    });
+                    if (err.response.data.length > 50) {
+                        Swal.fire({
+                            text: "가입에 실패했습니다. 다시 시도해주세요.",
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire({
+                            text: err.response.data,
+                            icon: 'error',
+                        });
+                    }
+
                 }
 
 
+            },
+            clickMenu(ref) {
+                console.log(ref);
+                if (ref.target.className == 'btn_mypage') {
+                    this.visibleMenu = !this.visibleMenu
+                } else {
+                    this.visibleMenu = false
+                }
             }
         }
     });

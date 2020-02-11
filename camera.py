@@ -9,7 +9,7 @@ imagePath = 'customers'
 fail_reason = ['EXCEEDS_MAX_FACES', 'EXTREME_POSE', 'LOW_BRIGHTNESS', 'LOW_SHARPNESS', 'LOW_CONFIDENCE',
                'SMALL_BOUNDING_BOX', 'LOW_FACE_QUALITY']
 client = boto3.client('rekognition')
-
+import aws_s3
 
 class VideoCamera(object):
     def __init__(self, videoNum):
@@ -23,8 +23,10 @@ class VideoCamera(object):
         ret, frame = self.video.read()
         return frame
 
-    def picture_shot(self, username, fr):
+    def picture_shot(self, username, fr,s3 = False):
         cv2.imwrite(os.path.join(imagePath, username), fr)
+        if s3:
+            return aws_s3.upload_file(os.path.join(imagePath, username),"facevisitor-bucket")
 
 # if __name__ == '__main__':
 #     cam = VideoCamera()

@@ -47,7 +47,7 @@
 .my_info .cont_member .id {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 16px;
     line-height: 24px;
     text-overflow: ellipsis;
@@ -130,7 +130,7 @@
 .dashboard .item {
     display: block;
     color: #00a2e1;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 48px;
     line-height: 66px;
     text-align: center
@@ -236,7 +236,7 @@
 .list_my .cont .tit {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 28px;
     line-height: 38px;
     text-overflow: ellipsis;
@@ -246,7 +246,7 @@
 .list_my .cont .txt {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 16px;
     line-height: 22px;
     text-overflow: ellipsis;
@@ -296,14 +296,14 @@
 
 .cont_pay.type1 .item_input .tf {
     float: right;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     text-align: right
 }
 
 .cont_pay.type2 .item_input .tf {
     float: right;
     font-weight: bold;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     text-align: right
 }
 
@@ -337,7 +337,7 @@
 }
 
 .cont_pay .item_input.prepare .tf {
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .cont_pay .box_message {
@@ -358,7 +358,7 @@
 
 .section_list .list_qna .link_box {
     display: block;
-    padding: 32px 32px 40px
+    padding: 32px 32px 32px
 }
 
 .section_list .list_qna .thumb {
@@ -378,7 +378,7 @@
 .section_list .list_qna .cont .tit {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 28px;
     line-height: 38px;
     text-overflow: ellipsis;
@@ -388,7 +388,7 @@
 .section_list .list_qna .cont .txt {
     display: block;
     overflow: hidden;
-    font-family: 'Spoqa Han Sans', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 16px;
     line-height: 22px;
     text-overflow: ellipsis;

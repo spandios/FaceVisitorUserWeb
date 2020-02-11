@@ -7,19 +7,23 @@ import threading
 import time
 
 import boto3
+boto3.setup_default_session(profile_name='face')
+
 import cv2
 import face_recognition
 import numpy as np
 
 import camera
+import aws_rekog
 
 customerCount = {}
 # customerCountDataFrame = pd.DataFrame(index=['count', 'like', 'start_time', 'end_time'])
 # print(customerCountDataFrame)
 fail_reason = ['EXCEEDS_MAX_FACES', 'EXTREME_POSE', 'LOW_BRIGHTNESS', 'LOW_SHARPNESS', 'LOW_CONFIDENCE',
                'SMALL_BOUNDING_BOX', 'LOW_FACE_QUALITY']
-client = boto3.client('rekognition')
-
+session = boto3.Session(profile_name="face")
+client = session.client('rekognition')
+similarity = 0.4
 
 class FaceRecog():
 
@@ -42,16 +46,18 @@ class FaceRecog():
                 self.known_face_names.append(name)
                 pathname = os.path.join(dirname, filename)
                 img = face_recognition.load_image_file(pathname)
-                face_encoding = face_recognition.face_encodings(img)[0]
-                self.known_face_encodings.append(face_encoding)
-
+                if len(face_recognition.face_encodings(img)) > 0:
+                    face_encoding = face_recognition.face_encodings(img)[0]
+                    self.known_face_encodings.append(face_encoding)
+        print(self.known_face_names)
         # Initialize some variables
         self.face_locations = []
         self.face_encodings = []
         self.face_names = []
         self.process_this_frame = True
         self.face_detected = False
-        self.cal_like()
+        # 좋아요 계산
+        # self.cal_like()
 
     def __del__(self):
         del self.camera
@@ -79,20 +85,21 @@ class FaceRecog():
             for face_encoding in self.face_encodings:
                 # See if the face is a match for the known face(s)
                 distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
-                min_value = min(distances)
-                # tolerance: How much distance between faces to consider it a match. Lower is more strict.
-                # 0.6 is typical best performance.
-                name = "NOT CUSTOMER"
-                if min_value < 0.45:
-                    index = np.argmin(distances)
-                    name = self.known_face_names[index]
-                    if name in customerCount:
-                        customerCount[name]['count'] = customerCount[name]['count'] + 1
-                        customerCount[name]['last_time'] = self.now()
+                if len(distances) > 0:
+                    min_value = min(distances)
+                    # tolerance: How much distance between faces to consider it a match. Lower is more strict.
+                    # 0.6 is typical best performance.
+                    name = "NOT CUSTOMER"
+                    if min_value < similarity:
+                        index = np.argmin(distances)
+                        name = self.known_face_names[index]
+                        if name in customerCount:
+                            customerCount[name]['count'] = customerCount[name]['count'] + 1
+                            customerCount[name]['last_time'] = self.now()
 
-                    else:
-                        customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(),
-                                               'last_time': self.now()}
+                        else:
+                            customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(),
+                                                   'last_time': self.now()}
 
                     # print("유사성 : " + str(min_value))
                     # print("현재 초 : " + str(time.localtime().tm_sec))
@@ -100,28 +107,43 @@ class FaceRecog():
                     # end = time.time()
                     # process_time = time.time() - start
 
-                self.face_names.append(name)
+                    self.face_names.append(name)
 
             # print(process_time)
 
         self.process_this_frame = not self.process_this_frame
 
         # Display the results
+        if len(self.face_names) > 0:
+            for (top, right, bottom, left), name in zip(self.face_locations, self.face_names):
+                # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+                top *= 4
+                right *= 4
+                bottom *= 4
+                left *= 4
 
-        for (top, right, bottom, left), name in zip(self.face_locations, self.face_names):
-            # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-            top *= 4
-            right *= 4
-            bottom *= 4
-            left *= 4
+                # Draw a box around the face
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-            # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+                # Draw a label with a name below the face
+                cv2.rectangle(frame, (left, bottom), (right, bottom), (0, 0, 255), cv2.FILLED)
+                font = cv2.FONT_HERSHEY_DUPLEX
+                cv2.putText(frame, name, (left + 6, bottom - 6), font, 2.0, (255, 255, 255), 2)
+        else:
+            for (top, right, bottom, left) in self.face_locations:
+                # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+                top *= 4
+                right *= 4
+                bottom *= 4
+                left *= 4
 
-            # Draw a label with a name below the face
-            cv2.rectangle(frame, (left, bottom), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 2.0, (255, 255, 255), 2)
+                # Draw a box around the face
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
+                # # Draw a label with a name below the face
+                # cv2.rectangle(frame, (left, bottom), (right, bottom), (0, 0, 255), cv2.FILLED)
+                # font = cv2.FONT_HERSHEY_DUPLEX
+                # cv2.putText(frame, name, (left + 6, bottom - 6), font, 2.0, (255, 255, 255), 2)
 
         return frame
 
@@ -144,14 +166,11 @@ class FaceRecog():
         count = 0
         process = []
         faceIds = []
-        while count < 4:
+        result = {}
+        while count < 3:
             time.sleep(1)
             tempFrame = self.camera.get_frame()
-            response = client.index_faces(CollectionId=collection_id,
-                                          Image={'Bytes': self.get_jpg_bytes()},
-                                          MaxFaces=1,
-                                          QualityFilter="HIGH",
-                                          DetectionAttributes=['ALL'])
+            response = aws_rekog.add_face_to_collection(collection_id,self.get_jpg_bytes())
             if len(response['UnindexedFaces']) > 0:
                 for unindexedFace in response['UnindexedFaces']:
                     if len(unindexedFace['Reasons']) > 0:
@@ -174,11 +193,12 @@ class FaceRecog():
         print("가장 정확한 얼굴 모양 데이터 : {}".format(max(process, key=lambda x: x[1])))
         ret, jpg = cv2.imencode('.jpg', pictureFrame)
         faceMeta = self.detect_face(jpg.tobytes())
-        print(faceMeta)
+        result['faceIds'] = faceIds
+        result['faceMeta'] = faceMeta
+        result['faceImageUrl'] = []
         for idx, (pictureFrame, sharpness, faceId) in enumerate(process):
-            self.camera.picture_shot(str(email) + "_" + str(idx) + "_" + str(datetime.datetime.now()) + ".jpg",
-                                     pictureFrame)
-        return faceIds, faceMeta
+            result['faceImageUrl'].append(self.camera.picture_shot(str(email) + "_" + str(idx) + ".jpg",pictureFrame,s3=True))
+        return result
 
     def find_face_by_byte(self, collection_id):
         faceIds = []
@@ -187,6 +207,7 @@ class FaceRecog():
                                                 Image={'Bytes': self.get_jpg_bytes()},
                                                 FaceMatchThreshold=70,
                                                 MaxFaces=1)
+
         faceMatches = response['FaceMatches']
         if not faceMatches:
             print("not match face")
@@ -217,8 +238,10 @@ class FaceRecog():
             if count is not None and count > 140:
                 customerCount[email]['like'] += count / 420
                 # 좋아요의 숫자는 머물었던 분
-
         threading.Timer(60, self.cal_like).start()
+
+    def login(self):
+        faceIds = self.find_face_by_byte('collection_test')
 
 
 if __name__ == '__main__':
