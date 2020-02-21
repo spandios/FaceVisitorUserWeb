@@ -6,15 +6,14 @@
     <meta content="ko-KR" http-equiv="Content-Language"/>
     <meta content="IE=Edge" http-equiv="X-UA-Compatible"/>
     <link href="../static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
     <link href="../static/css/common.css" rel="stylesheet">
     <link href="../static/css/main_back.css" rel="stylesheet">
 
 </head>
 <body>
-<div class="wrapper main" id="app" @click="clickMenu">
 
+<div class="wrapper main animated fadeIn" id="app" @click="clickMenu" v-if="user">
     <div class="header" style="background-color: black; color:white;">
         <div class="inner">
             <h1 class="logo" style="margin-top: 16px;"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
@@ -26,7 +25,7 @@
                 </ul>
                 <div class="my_menu">
                     <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button" ><span class="blind">검색</span></button>
+                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
                         <div class="layer_search">
                             <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
                         </div>
@@ -49,7 +48,7 @@
                 <div class="col-2">
                     <div class="name_container">
                         <div class="name">
-                            허주영님
+                            {{user.name}}님
                         </div>
                         <div class="level">
                             LV.4 플레티넘
@@ -71,7 +70,7 @@
                         쿠폰
                     </div>
                     <div class="value">
-                        7
+                        7장
                     </div>
                 </div>
 
@@ -81,7 +80,7 @@
                         좋아요
                     </div>
                     <div class="value">
-                        7장
+                        7개
                     </div>
                 </div>
             </div>
@@ -92,12 +91,9 @@
     <div class="container2">
         <div class="container d-flex flex-row">
             <div class="rectangle">
-                <!--                        <div class="store_intro_sub">-->
-                <!--                            방문하신 매장은-->
-                <!--                        </div>-->
                 <div class="store_intro ">
-                    <span class="store_intro_text ">올리브 주영 배곧점 </span>
-                    <div style="display: flex; margin-top: 10px" >
+                    <span class="store_intro_text ">{{store.name}} </span>
+                    <div style="display: flex; margin-top: 10px">
                         <div style="margin : 14px 16px 0 0">
                             고객님의 관심 상품은?
                         </div>
@@ -121,75 +117,24 @@
             </div>
         </div>
 
-        <div class="section_list livingroom">
+        <div class="section_list recommend">
             <div class="inner">
-                <h2 class="tit_comm">이런 상품들은 어떠신가요?<span class="small"><span style="color:#0658fc">허주영</span>님을 위한 맞춤 추천 메뉴입니다</span></h2>
+                <h2 class="tit_comm">이런 상품들은 어떠신가요?<span class="small"><span style="color:#0658fc">{{user.name}}</span>님을 위한 맞춤 추천 메뉴입니다</span>
+                </h2>
                 <div class="swiper-container">
                     <ul class="swiper-wrapper list_comm">
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
+                        <li class="swiper-slide" v-for="item of recommend">
+                            <a class="link_box" :href=`/goods/${item.id}`>
                                 <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
+                                                         :src="item.images[0].url"
                                                          width="262"></span>
                                 <span class="cont">
-                                    <span class="txt">Xing Zheng QqkKjJpP QqkKjJpP QqkKjJpP QqkKjJpP</span>
-                                    <strong class="tit">Yogarasa Gandhi QqkKjJpP QqkKjJpP QqkKjJpP QqkKjJpP</strong>
-                                    <span class="price">$ 3,000</span>
+                                    <span class="txt">{{item.vendor}}</span>
+                                    <strong class="tit">{{item.name}}</strong>
+                                    <span class="price">{{item.price}}</span>
                                 </span>
                             </a>
                             <button class="btn_like on" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
                         </li>
 
                         <li class="swiper-slide">
@@ -206,83 +151,24 @@
             </div>
         </div>
 
-        <div class="section_list kitchen">
+        <div class="section_list best">
             <div class="inner">
-                <h2 class="tit_comm">상품 결정에 고민이 있으신가요?<span class="small"><span style="color:#0658fc">올리브 주영</span>에서 가장 인기있는 상품을 모아봤어요</span></h2>
+                <h2 class="tit_comm">상품 결정에 고민이 있으신가요?<span class="small"><span style="color:#0658fc">올리브 주영</span>에서 가장 인기있는 상품을 모아봤어요</span>
+                </h2>
                 <div class="swiper-container">
                     <ul class="swiper-wrapper list_comm">
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                        <span class="thumb"><img alt="" height="238"
-                                                                 src="https://picsum.photos/238/262"
-                                                                 width="262"></span>
+                        <li class="swiper-slide" v-for="item of best">
+                            <a class="link_box" :href=`/goods/${item.id}`>
+                                <span class="thumb"><img alt="" height="238"
+                                                         :src="item.images[0].url"
+                                                         width="262"></span>
                                 <span class="cont">
-                                            <span class="txt">Xing Zheng</span>
-                                            <strong class="tit">Yogarasa Gandhi</strong>
-                                            <span class="price">$ 3,000</span>
-                                        </span>
+                                    <span class="txt">{{item.vendor}}</span>
+                                    <strong class="tit">{{item.name}}</strong>
+                                    <span class="price">{{item.price}}</span>
+                                </span>
                             </a>
                             <button class="btn_like on" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                        <span class="thumb"><img alt="" height="238"
-                                                                 src="https://picsum.photos/238/262"
-                                                                 width="262"></span>
-                                <span class="cont">
-                                            <span class="txt">Xing Zheng</span>
-                                            <strong class="tit">Yogarasa Gandhi</strong>
-                                            <span class="price">$ 3,000</span>
-                                        </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                        <span class="thumb"><img alt="" height="238"
-                                                                 src="https://picsum.photos/238/262"
-                                                                 width="262"></span>
-                                <span class="cont">
-                                            <span class="txt">Xing Zheng</span>
-                                            <strong class="tit">Yogarasa Gandhi</strong>
-                                            <span class="price">$ 3,000</span>
-                                        </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                        <span class="thumb"><img alt="" height="238"
-                                                                 src="https://picsum.photos/238/262"
-                                                                 width="262"></span>
-                                <span class="cont">
-                                            <span class="txt">Xing Zheng</span>
-                                            <strong class="tit">Yogarasa Gandhi</strong>
-                                            <span class="price">$ 3,000</span>
-                                        </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                        <span class="thumb"><img alt="" height="238"
-                                                                 src="https://picsum.photos/238/262"
-                                                                 width="262"></span>
-                                <span class="cont">
-                                            <span class="txt">Xing Zheng</span>
-                                            <strong class="tit">Yogarasa Gandhi</strong>
-                                            <span class="price">$ 3,000</span>
-                                        </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <button style="width : 100%; height:322px; background-color: rgba(121,125,121,0.76); color:white; font-size: 24px; font-weight: bold">
-                                    모두 보기
-                                </button>
-                            </a>
-                        </li>
                         </li>
                     </ul>
                 </div>
@@ -291,105 +177,28 @@
             </div>
         </div>
 
-        <!--        <div class="section_list kitchen">-->
-        <!--            <div class="inner">-->
-        <!--                <h2 class="tit_comm">구매하실 상품을 고르셨나요?</h2>-->
-        <!--                <div class="container text-center" style="margin-top: 16px;">-->
-        <!--                    <div class="row">-->
-        <!--                        <div class="col" style="font-weight: bold; font-size: 18px;">-->
-        <!--                            셀프결제로 더 빠르고 간편하게 결제해보세요!-->
-        <!--                        </div>-->
-        <!--                    </div>-->
-        <!--                    <div class="row">-->
-        <!--                        <div class="col">-->
-        <!--                            <button class="btn_comm primary"-->
-        <!--                                    style="padding-left: 8px; padding-right:8px; font-size: 24px; font-weight: normal; margin-top: 24px;">-->
-        <!--                                셀프 결제하기-->
-        <!--                            </button>-->
-        <!--                        </div>-->
-        <!--                    </div>-->
-        <!--                </div>-->
-        <!--            </div>-->
-        <!--        </div>-->
 
-        <!--        <div class="section_list kitchen">-->
-        <!--            <div class="inner">-->
-        <!--                <h2 class="tit_comm">상품을 다 고르셨나요?</h2>-->
-        <!--            </div>-->
-        <!--        </div>-->
 
         <div class="section_list history">
             <div class="inner">
                 <h2 class="tit_comm">최근 본 상품</h2>
                 <div class="swiper-container">
                     <ul class="swiper-wrapper list_comm">
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
+                        <li class="swiper-slide" v-for="item of history">
+                            <a class="link_box" :href=`/goods/${item.id}`>
                                 <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
+                                                         :src="item.images[0].url"
                                                          width="262"></span>
                                 <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
+                                    <span class="txt">{{item.vendor}}</span>
+                                    <strong class="tit">{{item.name}}</strong>
+                                    <span class="price">{{item.price}}</span>
                                 </span>
                             </a>
                             <button class="btn_like on" type="button"><span class="blind">좋아요</span></button>
                         </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
-                        <li class="swiper-slide">
-                            <a class="link_box" href="#">
-                                <span class="thumb"><img alt="" height="238"
-                                                         src="https://picsum.photos/238/262"
-                                                         width="262"></span>
-                                <span class="cont">
-                                    <span class="txt">Xing Zheng</span>
-                                    <strong class="tit">Yogarasa Gandhi</strong>
-                                    <span class="price">$ 3,000</span>
-                                </span>
-                            </a>
-                            <button class="btn_like" type="button"><span class="blind">좋아요</span></button>
-                        </li>
 
-                            <li class="swiper-slide">
+                        <li class="swiper-slide">
                             <a class="link_box" href="#">
                                 <button style="width : 100%; height:322px; background-color: rgba(121,125,121,0.76); color:white; font-size: 24px; font-weight: bold">
                                     모두 보기
@@ -403,9 +212,36 @@
                 <button class="btn_slide btn_next" type="button"><span class="blind">다음</span></button>
             </div>
         </div>
+
+
+           <div class="section_list kitchen">
+            <div class="inner">
+                <h2 class="tit_comm">구매하실 상품을 고르셨나요?</h2>
+                <div class="container text-center" style="margin-top: 16px;">
+                    <div class="row">
+                        <div class="col" style="font-weight: bold; font-size: 18px;">
+                            셀프결제로 더 빠르고 간편하게 결제해보세요!
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn_comm primary"
+                                    style="background-color:#0658fc;padding-left: 8px; padding-right:8px; font-size: 24px; font-weight: normal; margin-top: 24px;">
+                                셀프 결제하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
     (% include 'partials/footer.html' %)
 </div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
 <script>
@@ -414,8 +250,53 @@
         el: '#app',
         data: {
             visibleMenu: false,
+            user: null,
+            store: null,
+            storeId: 23,
+            recommend: [],
+            best: [],
+            history: []
         },
-        created() {
+        async created() {
+
+            try {
+                const access_token = localStorage.getItem("access_token");
+                if (!access_token) {
+                    Swal.fire({
+                        text: "인증 되지 않았습니다.",
+                        icon: 'error',
+                    }).then(result => {
+                        if (result.value) {
+                            location.href = "/";
+                        }
+                    });
+                }
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+                var {data} = await axios.get('http://localhost:5001/api/v1/user/me');
+                this.user = data;
+                var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
+                this.store = storeResponse.data;
+
+
+                console.log("매장 : " + this.store);
+
+                var recommendResponse = await axios.get('http://localhost:5001/api/v1/user/goods/init/recommend');
+                this.recommend = recommendResponse.data;
+                console.log(this.recommend);
+
+                var bestResponse = await axios.get('http://localhost:5001/api/v1/user/goods/init/best');
+                this.best = bestResponse.data;
+                console.log(this.best);
+
+                var historyResponse = await axios.get('http://localhost:5001/api/v1/user/goods/init/history');
+                this.history = historyResponse.data;
+                console.log(this.history);
+
+
+            } catch (e) {
+                console.log(e);
+            }
+            Swal.close();
 
         },
         methods: {
@@ -427,28 +308,35 @@
                 }
             }
         },
-        mounted() {
+        async mounted() {
+            // Swal.showLoading();
+            await new Promise(resolve => {
+                setTimeout(function () {
+                    resolve()
+                }, 500)
 
-            var livingRoom = $('.livingroom');
-            if ($('.swiper-slide', livingRoom).length > 4) {
-                $('button.btn_slide', livingRoom).show();
-                var swiperTarget1 = new Swiper($('.swiper-container', livingRoom), {
+            });
+
+            var recommend = $('.recommend');
+            if ($('.swiper-slide', recommend).length > 4) {
+                $('button.btn_slide', recommend).show();
+                var swiperTarget1 = new Swiper($('.swiper-container', recommend), {
                     slidesPerView: 4,
                     navigation: {
-                        prevEl: $('.btn_prev', livingRoom),
-                        nextEl: $('.btn_next', livingRoom),
+                        prevEl: $('.btn_prev', recommend),
+                        nextEl: $('.btn_next', recommend),
                     }
                 });
             }
 
-            var Kitchen = $('.kitchen');
-            if ($('.swiper-slide', Kitchen).length > 4) {
-                $('button.btn_slide', Kitchen).show();
-                var swiperTarget2 = new Swiper($('.swiper-container', Kitchen), {
+            var best = $('.best');
+            if ($('.swiper-slide', best).length > 4) {
+                $('button.btn_slide', best).show();
+                var swiperTarget2 = new Swiper($('.swiper-container', best), {
                     slidesPerView: 4,
                     navigation: {
-                        prevEl: $('.btn_prev', Kitchen),
-                        nextEl: $('.btn_next', Kitchen),
+                        prevEl: $('.btn_prev', best),
+                        nextEl: $('.btn_next', best),
                     }
                 });
             }
@@ -465,12 +353,17 @@
                     }
                 });
             }
+            Swal.close();
         },
     });
 
 
 </script>
 <style>
+
+    #app {
+        animation-delay: 1s;
+    }
 
     .header {
         background-color: black;

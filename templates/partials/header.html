@@ -3,38 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../../static/css/common_empty.css" rel="stylesheet">
+    <style>
+
+    </style>
 </head>
 <body>
-    <div class="header">
-        <!-- <div class="wrap_head"> 제거 -->
-        <div class="inner">
-            <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
-            <div class="gnb">
-                <ul class="service_menu">
-
-                    <li><a class="link" href="##">셀프결제</a></li>
-                </ul>
-                <div class="my_menu">
-                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
-                        <div class="layer_search">
-                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
-                        </div>
+<div class="header">
+    <!-- <div class="wrap_head"> 제거 -->
+    <div class="inner">
+        <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
+        <div class="gnb">
+            <ul class="service_menu">
+                <li><a class="link" href="##">셀프결제</a></li>
+            </ul>
+            <div class="my_menu">
+                <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
+                    <button class="btn_search" type="button"><span class="blind">검색</span></button>
+                    <div class="layer_search">
+                        <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
                     </div>
-                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
-                        <div class="layer_menu">
-                            <ul class="menu">
-                                <li><a href="##">주문내역</a></li>
-                                <li><a href="##"></a></li>
-                            </ul>
-                            <a class="logout" href="#">로그아웃</a>
-                        </div>
+                </div>
+                <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                    <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
+                    <div class="layer_menu">
+                        <ul class="menu">
+                            <li><a href="##">주문내역</a></li>
+                            <li><a href="##"></a></li>
+                        </ul>
+                        <a class="logout" href="#">로그아웃</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
+
+<style>
+    .header {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        height: 64px;
+        box-sizing: border-box;
+        box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.5)
+    }
+
+    .header .logo {
+        display: inline-block;
+        vertical-align: top
+    }
+
+    .header .logo a {
+        display: block;
+        padding: 13px 0
+    }
+
+    .header .logo a:before {
+        display: block;
+        width: 280px;
+        height: 38px;
+        background: url('../../static/images/logo_facevisitor_small.png') no-repeat;
+        content: ""
+    }
+</style>
 </html>
