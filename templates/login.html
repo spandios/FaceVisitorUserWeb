@@ -81,7 +81,7 @@
                     localStorage.setItem("access_token",data.access_token);
                     localStorage.setItem("refresh_token",data.refresh_token);
                     axios.defaults.headers.common['Authorization'] = 'bearer '+data.access_token;
-                    console.log(axios.defaults)
+
 
                 } catch (e) {
                     if(err.response.data.length>50){

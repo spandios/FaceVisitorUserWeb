@@ -129,7 +129,7 @@ def is_user():
             else:
                 return "요청 중 문제가 있습니다.", 400
         else:
-            return "false", 400
+            return "false", 200
     except Exception as e:
         print(e)
         return "서버에 오류가 있습니다.", 400
