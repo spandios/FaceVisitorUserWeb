@@ -1,0 +1,319 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>셀프결제</title>
+    <script src="/static/jsQR.js"></script>
+    <script src="/static/vue-good-table.js"></script>
+    <link href="/static/vue-good-table.css" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta content="ko-KR" http-equiv="Content-Language"/>
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible"/>
+    <link href="../static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
+    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../static/css/main_back.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <div class="inner">
+            <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
+            <div class="gnb">
+                <ul class="service_menu">
+                    <li><a class="link" href="##" style="color: white">셀프결제</a></li>
+                    <li><a class="link" href="##" style="color: white">장바구니</a></li>
+                    <li><a class="link" href="##" style="color: white">직원호출</a></li>
+                </ul>
+                <div class="my_menu">
+                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
+                        <div class="layer_search">
+                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
+                        </div>
+                    </div>
+                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
+                        <div class="layer_menu">
+                            <ul class="menu">
+                                <li><a href="##">주문내역</a></li>
+                                <li><a href="##"></a></li>
+                            </ul>
+                            <a class="logout" href="#">로그아웃</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="content">
+        <div class="dashboard">
+            <ul>
+                <li>
+                    <img src="/static/images/qr.png" width="30" height="30">
+                    <div class="title" :class="{bold : status ==0}">
+                        01. QR 상품 인식
+                    </div>
+                </li>
+
+                <li>
+                    <img src="static/images/point.png" width="30" height="30"/>
+                    <div class="title" :class="{bold : status == 1}">
+                        02. 포인트/ 쿠폰
+                    </div>
+                </li>
+
+                <li>
+                    <img src="/static/images/credit.png" width="50" height="30">
+                    <div class="title" :class="{bold : status == 2}">
+                        03. 결제
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!--        <h5>QR코드를 인식해주세요</h5>-->
+        <canvas id="canvas"></canvas>
+        <div class="qr_goods_list">
+            <vue-good-table
+                    :columns="columns"
+                    :rows="rows"/>
+        </div>
+
+        <div class="cart_goods_list">
+
+        </div>
+    </div>
+    (% include 'partials/footer.html' %)
+</div>
+</body>
+</html>
+
+<script>
+    Vue.component(VueGoodTable.name, VueGoodTable);
+
+
+    goods_list = [];
+
+    new Vue({
+        el: '#app',
+        components: {
+
+        },
+        data: {
+            goods: null,
+            recommend: null,
+            visibleMenu: false,
+            status: 0,
+
+            columns: [
+                {
+                    label: 'Name',
+                    field: 'name',
+                },
+                {
+                    label: 'Age',
+                    field: 'age',
+                    type: 'number',
+                },
+                {
+                    label: 'Created On',
+                    field: 'createdAt',
+                    type: 'date',
+                    dateInputFormat: 'yyyy-MM-dd',
+                    dateOutputFormat: 'MMM Do yy',
+                },
+                {
+                    label: 'Percent',
+                    field: 'score',
+                    type: 'percentage',
+                },
+            ],
+            rows: [
+                {id: 1, name: "John", age: 20, createdAt: '', score: 0.03343},
+                {id: 2, name: "Jane", age: 24, createdAt: '2011-10-31', score: 0.03343},
+                {id: 3, name: "Susan", age: 16, createdAt: '2011-10-30', score: 0.03343},
+                {id: 4, name: "Chris", age: 55, createdAt: '2011-10-11', score: 0.03343},
+                {id: 5, name: "Dan", age: 40, createdAt: '2011-10-21', score: 0.03343},
+                {id: 6, name: "John", age: 20, createdAt: '2011-10-31', score: 0.03343},
+            ],
+        },
+        async created() {
+            try {
+                const access_token = localStorage.getItem("access_token");
+                if (!access_token) {
+                    Swal.fire({
+                        text: "인증 되지 않았습니다.",
+                        icon: 'error',
+                    }).then(result => {
+                        if (result.value) {
+                            location.href = "/";
+                        }
+                    });
+                }
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+
+
+            } catch (e) {
+                console.log(e.response.data);
+                Swal.fire({
+                    text: e.message,
+                    icon: 'error',
+                })
+            }
+            // Swal.close();
+
+        },
+        methods: {
+            addToCart() {
+                console.log(goods_id)
+            },
+            order() {
+            },
+
+            clickMenu(ref) {
+                if (ref.target.className == 'btn_mypage') {
+                    this.visibleMenu = !this.visibleMenu
+                } else {
+                    this.visibleMenu = false
+                }
+            }
+
+        },
+        async mounted() {
+
+            var video = document.createElement("video");
+            var canvasElement = document.getElementById("canvas");
+            var canvas = canvasElement.getContext("2d");
+
+            function drawLine(begin, end, color) {
+                canvas.beginPath();
+                canvas.moveTo(begin.x, begin.y);
+                canvas.lineTo(end.x, end.y);
+                canvas.lineWidth = 4;
+                canvas.strokeStyle = color;
+                canvas.stroke();
+            }
+
+            // Use facingMode: environment to attemt to get the front camera on phones
+            navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}).then(function (stream) {
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+                video.play();
+                requestAnimationFrame(tick);
+            });
+
+            async function tick() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvasElement.hidden = false;
+
+                    canvasElement.height = video.videoHeight;
+                    canvasElement.width = video.videoWidth;
+                    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                    var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                    var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert",
+                    });
+                    if (code) {
+                        if (code.data) {
+                            drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+                            drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+                            drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+                            drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+                            let index = goods_list.findIndex(value => value.id == code.data);
+                            if (index < 0) {
+                                var goods = {};
+
+                                var goodsResponse = await axios.get('http://localhost:5001/api/v1/user/goods/' + code.data);
+                                goods.id = code.data;
+                                goods.data = goodsResponse.data;
+                                goods_list.push(goods);
+                                console.log(goods_list)
+                            }
+                        }
+
+                    } else {
+
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+
+
+            await new Promise(resolve => {
+                setTimeout(function () {
+                    resolve()
+                }, 500)
+
+            });
+
+            var similar = $('.similar');
+            if ($('.swiper-slide', similar).length > 4) {
+                $('button.btn_slide', similar).show();
+                var swiperTarget1 = new Swiper($('.swiper-container', similar), {
+                    slidesPerView: 4,
+                    navigation: {
+                        prevEl: $('.btn_prev', similar),
+                        nextEl: $('.btn_next', similar),
+                    }
+                });
+            }
+        }
+    });
+
+
+</script>
+
+<style scoped>
+
+    #content {
+        margin: 24px 0px;
+        text-align: center;
+        min-height: 800px;
+    }
+
+    #canvas {
+        width: 200px;
+        height: 200px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 16px;
+        display: block;
+        /*position: absolute;*/
+    }
+
+    .dashboard {
+        width: 580px;
+        margin: 0 auto;
+        padding: 16px;
+        height: 90px;
+        box-sizing: border-box;
+        background: #f6f6f6;
+    }
+
+    .dashboard li {
+        float: left;
+        width: 33%;
+        height: 40px;
+        border-left: 1px solid #e0e0e0;
+        box-sizing: border-box;
+    }
+
+    .dashboard li:first-child {
+        border-left: 0px;
+    }
+
+    .title {
+        margin-top: 8px;
+        font-size: 14px;
+    }
+
+    .bold {
+        color: #0658fc;
+    }
+</style>

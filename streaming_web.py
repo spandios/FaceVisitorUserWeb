@@ -107,11 +107,22 @@ def video_feed():
 def get_main():
     return render_template('main.html')
 
+@app.route('/goods/<goods_id>')
+def get_goods_detail(goods_id):
+    return render_template('goods_detail.html', goods_id =goods_id)
+
+@app.route('/self_pay')
+def get_self_pay():
+    return render_template('self_pay.html')
+
 
 @app.route('/is_face_detected')
 def face_detectd():
     return jsonify(is_face_detected=faceObject.face_detected)
 
+@app.route('/test')
+def test():
+    return render_template('./vue/dist/index.html')
 
 @app.route('/is_user')
 def is_user():
