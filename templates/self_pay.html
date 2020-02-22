@@ -1,0 +1,582 @@
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>셀프결제</title>
+    <script src="/static/jsQR.js"></script>
+    <script src="/static/vue-good-table.js"></script>
+    <link href="/static/vue-good-table.css" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Language" content="ko-KR"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link href="../static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
+    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../static/css/main_back.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <script src="/static/secret.js"></script>
+    <link href="/static/css/common.css" rel="stylesheet">
+
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <div class="inner">
+            <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
+            <div class="gnb">
+                <ul class="service_menu">
+                    <li><a class="link" href="##" style="color: white">셀프결제</a></li>
+                    <li><a class="link" href="##" style="color: white">장바구니</a></li>
+                    <li><a class="link" href="##" style="color: white">직원호출</a></li>
+                </ul>
+                <div class="my_menu">
+                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
+                        <div class="layer_search">
+                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
+                        </div>
+                    </div>
+                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
+                        <div class="layer_menu">
+                            <ul class="menu">
+                                <li><a href="##">주문내역</a></li>
+                                <li><a href="##"></a></li>
+                            </ul>
+                            <a class="logout" href="#">로그아웃</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="content">
+        <div class="dashboard">
+            <ul>
+                <li>
+                    <img src="/static/images/qr.png" width="40" height="40">
+                    <div class="title">
+                        01. QR 상품 인식
+                    </div>
+                </li>
+
+                <li>
+                    <img src="static/images/point.png" width="40" height="40"/>
+                    <div class="title">
+                        02. 포인트/쿠폰 할인적용
+                    </div>
+                </li>
+
+                <li>
+                    <img src="/static/images/credit.png" width="40" height="40">
+                    <div class="title">
+                        03. 결제
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="scan_product">
+            <canvas id="canvas"></canvas>
+
+            <div style="font-size: 18px;margin-top: 32px;"><b>QR 인식 리스트</b></div>
+            <div class="qr_goods_list" style="margin-top: 24px">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col" style="text-align: center">상품정보</th>
+                        <th scope="col" style="text-align: center">상품가격</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="height: 100px" v-for="item of goods_list">
+                        <th style="width: 10%">
+                            <div class="table_item_goods" style="justify-content: center;height: 100px">
+                                <input type="checkbox" v-model="item.selected">
+                            </div>
+                        </th>
+                        <td style="width : 75%">
+                            <div class="table_item_goods">
+                                <template>
+                                    <img :src="item.content.img" width="100" height="100">
+                                    <div class="goods_info">
+                                        <div class="goods_text">
+                                            {{item.content.name}}
+                                        </div>
+                                    </div>
+                                    <select class="qty" v-model="item.content.qty">
+
+                                        <option v-for="qty of qtyList" :index="qty" :value="qty">{{qty}}</option>
+                                    </select>
+                                </template>
+                            </div>
+
+
+                        </td>
+                        <td style="width : 15%">
+                            <div class="table_item_goods"
+                                 style="height: 100px; font-size: 18px; justify-content: center">
+                                <div>
+                                    {{qtyPrice(item.content)}} 원
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="font-size: 18px;margin-top: 32px;"><b>장바구니 리스트</b></div>
+            <div class="qr_goods_list" style="margin-top: 24px">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col" style="text-align: center">상품정보</th>
+                        <th scope="col" style="text-align: center">상품가격</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="height: 100px" v-for="item of goods_list">
+                        <th style="width: 10%">
+                            <div class="table_item_goods" style="justify-content: center;height: 100px">
+                                <input type="checkbox" v-model="item.selected">
+                            </div>
+                        </th>
+                        <td style="width : 75%">
+                            <div class="table_item_goods">
+                                <img :src="item.content.img" width="100" height="100">
+                                <div class="goods_info">
+                                    <div class="goods_text">
+                                        {{item.content.name}}
+                                    </div>
+                                </div>
+                                <select class="qty" v-model="item.content.qty">
+                                    <option v-for="qty of qtyList" :index="qty" :value="qty">{{qty}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="width : 15%">
+                            <div class="table_item_goods"
+                                 style="height: 100px; font-size: 18px; justify-content: center">
+                                <div>
+                                    {{qtyPrice(item.content)}} 원
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="total_price">
+            <div style="font-size: 16px;">
+                사용 가능 포인트 :100
+            </div>
+            <div style="margin-top: 14px;">
+                사용 할 포인트 : <input type="text" placeholder="포인트 입력" v-model="usePoint">
+            </div>
+        </div>
+
+        <div class="total_price">
+            <div>
+                예상 적립 포인트 : {{expectedPoint}}원
+            </div>
+            <div v-if="usePoint>0">
+                사용할 포인트 : {{usePoint}}
+            </div>
+            <b style="font-size: 24px">총 결제금액 : {{payPrice}}</b>
+        </div>
+
+        <form action="/charge" method="post" id="payment-form" style="width: 1024px; margin: 0 auto;">
+            <div class="form-row">
+                <div id="card-element" style="margin: 0 auto;">
+                </div>
+            </div>
+
+            <button class="btn_comm primary"
+                    style="font-size:24px;padding-left: 8px; padding-right: 8px;margin-top: 18px">결제하기
+            </button>
+        </form>
+
+    </div>
+    (% include 'partials/footer.html' %)
+</div>
+</body>
+</html>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+
+
+    var vue = new Vue({
+            el: '#app',
+            components: {},
+            data: {
+                goods: null,
+                recommend: null,
+                visibleMenu: false,
+                status: 0,
+                qtyList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                stripe: null,
+                card: null,
+                goods_list: [],
+                usePoint : 0,
+
+            },
+            async created() {
+                try {
+                    const access_token = localStorage.getItem("access_token");
+                    if (!access_token) {
+                        Swal.fire({
+                            text: "인증 되지 않았습니다.",
+                            icon: 'error',
+                        }).then(result => {
+                            if (result.value) {
+                                location.href = "/";
+                            }
+                        });
+                    }
+                    axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+
+
+                } catch (e) {
+                    console.log(e.response.data);
+                    Swal.fire({
+                        text: e.message,
+                        icon: 'error',
+                    })
+                }
+                // Swal.close();
+
+            },
+            computed: {
+                payPrice() {
+                    var result = 0;
+                    let selected = this.goods_list.filter(goods => goods.selected === true).map(goods => goods.content);
+                    selected.forEach(content => {
+                        result += content.totalPrice
+                    });
+                    if(this.usePoint>0){
+                        result = result - this.usePoint;
+                    }
+                    return result;
+                },
+                expectedPoint() {
+                    return Math.round(this.payPrice * 0.07) * 100 / 100
+
+                }
+            },
+            methods: {
+                qtyPrice(goods) {
+                    var price = goods.qty * goods.price;
+                    goods.totalPrice = price;
+                    return price;
+                },
+
+                addToCart() {
+                    console.log(goods_id)
+                },
+                order() {
+                },
+
+                clickMenu(ref) {
+                    if (ref.target.className == 'btn_mypage') {
+                        this.visibleMenu = !this.visibleMenu
+                    } else {
+                        this.visibleMenu = false
+                    }
+                }
+
+            },
+            async mounted() {
+                var context = Vue;
+                this.goods_list.push({
+                    id: 32,
+                    selected: true,
+                    content: {name: '상품명 test', img: 'https://dummyimage.com/100x100/000/555', qty: 1, price: 1000,}
+                });
+                var video = document.createElement("video");
+                var canvasElement = document.getElementById("canvas");
+                var canvas = canvasElement.getContext("2d");
+
+                function drawLine(begin, end, color) {
+                    canvas.beginPath();
+                    canvas.moveTo(begin.x, begin.y);
+                    canvas.lineTo(end.x, end.y);
+                    canvas.lineWidth = 4;
+                    canvas.strokeStyle = color;
+                    canvas.stroke();
+                }
+
+                // Use facingMode: environment to attemt to get the front camera on phones
+                navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}).then(function (stream) {
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+                    video.play();
+                    requestAnimationFrame(tick);
+                });
+
+                async function tick() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        canvasElement.hidden = false;
+
+                        canvasElement.height = video.videoHeight;
+                        canvasElement.width = video.videoWidth;
+                        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                        var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                        var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "dontInvert",
+                        });
+                        if (code) {
+                            if (code.data && Number.isInteger(code.data)) {
+                                drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+                                drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+                                drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+                                drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+                                let index = goods_list.findIndex(value => value.id == code.data);
+                                if (index < 0) {
+                                    var goods = {};
+
+                                    var goodsResponse = await axios.get('http://localhost:5001/api/v1/user/goods/' + code.data);
+                                    goods.id = code.data;
+                                    goods.content = goodsResponse.data;
+                                    goods.content.qty = 1;
+                                    goods.content.selected = true;
+                                    vue.goods_list.push(goods);
+                                    console.log(vue.goods_list)
+                                }
+                            }
+
+                        } else {
+
+                        }
+                    }
+                    requestAnimationFrame(tick);
+                }
+
+
+                await new Promise(resolve => {
+                    setTimeout(function () {
+                        resolve()
+                    }, 500)
+                });
+
+                var similar = $('.similar');
+                if ($('.swiper-slide', similar).length > 4) {
+                    $('button.btn_slide', similar).show();
+                    var swiperTarget1 = new Swiper($('.swiper-container', similar), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', similar),
+                            nextEl: $('.btn_next', similar),
+                        }
+                    });
+                }
+
+                var stripe = Stripe('pk_test_2UoOrX6dpNBGN8MPbAYUfeI600DpoLdoXZ');
+
+// Create an instance of Elements.
+                var elements = stripe.elements();
+
+// Custom styling can be passed to options when creating an Element.
+// (Note that this demo uses a wider set of styles than the guide below.)
+                var style = {
+                    base: {
+                        color: '#32325d',
+                        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                        fontSmoothing: 'antialiased',
+                        fontSize: '16px',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#fa755a',
+                        iconColor: '#fa755a'
+                    }
+                };
+
+// Create an instance of the card Element.
+                var card = elements.create('card', {hidePostalCode: true, style: style});
+
+// Add an instance of the card Element into the `card-element` <div>.
+                card.mount('#card-element');
+
+// Handle real-time validation errors from the card Element.
+                card.addEventListener('change', function (event) {
+                    var displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+
+// Handle form submission.
+                var form = document.getElementById('payment-form');
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    if(payPrice>0){
+                           stripe.createToken(card).then(function (result) {
+                        if (result.error) {
+                            // Inform the user if there was an error.
+                            var errorElement = document.getElementById('card-errors');
+                            errorElement.textContent = result.error.message;
+                        } else {
+                            // Send the token to your server.
+                            console.log(result.token);
+                        }
+                    });
+                    }else{
+                        alert("결제금액이 없습니다.")
+                    }
+                });
+
+// Submit the form with the token ID.
+
+            }
+        }
+    );
+
+
+</script>
+
+<style scoped>
+
+    #content {
+        margin: 24px 0px;
+        text-align: center;
+        min-height: 800px;
+    }
+
+    #canvas {
+        width: 200px;
+        height: 200px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 16px;
+        display: block;
+        /*position: absolute;*/
+    }
+
+    .dashboard {
+        width: 580px;
+        margin: 0 auto;
+        padding: 16px;
+        height: 90px;
+        box-sizing: border-box;
+        background: #f6f6f6;
+    }
+
+    .dashboard li {
+        float: left;
+        width: 33%;
+        height: 40px;
+        border-left: 1px solid #e0e0e0;
+        box-sizing: border-box;
+    }
+
+    .dashboard li:first-child {
+        border-left: 0px;
+    }
+
+    .title {
+        margin-top: 8px;
+        font-size: 14px;
+    }
+
+    .bold {
+        color: #0658fc;
+    }
+
+    .table {
+        margin-bottom: 0px;
+    }
+
+    .qr_goods_list {
+        margin: 0 auto;
+        width: 1040px;
+        border: 1px solid #6c757d;
+    }
+
+
+    .table_item_goods {
+        display: flex;
+        align-items: center;
+    }
+
+    .goods_info {
+        padding: 16px 0px;
+        font-size: 18px;
+    }
+
+    .goods_text {
+        max-width: 500px;
+        height: 64px;
+        max-lines: 2;
+        overflow: hidden;
+        margin-left: 24px;
+        text-overflow: ellipsis;
+    }
+
+
+    .qty {
+        height: 46px;
+        margin-left: 500px;
+    }
+
+    .cart_goods_list {
+
+        margin: 0 auto;
+        margin-top: 14px;
+        width: 1040px;
+        border: 1px solid #6c757d;
+    }
+
+    .total_price {
+        background-color: #f6f6f6;
+        height: 120px;
+        margin: 24px auto;
+        width: 1040px;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+
+    .StripeElement {
+        box-sizing: border-box;
+        width: 600px;
+        height: 80px;
+        padding: 24px 12px;
+
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background-color: white;
+
+        box-shadow: 0 1px 3px 0 #e6ebf1;
+        -webkit-transition: box-shadow 150ms ease;
+        transition: box-shadow 150ms ease;
+    }
+
+    .StripeElement--focus {
+        box-shadow: 0 1px 3px 0 #cfd7df;
+    }
+
+    .StripeElement--invalid {
+        border-color: #fa755a;
+    }
+
+    .StripeElement--webkit-autofill {
+        background-color: #fefde5 !important;
+    }
+</style>
+>

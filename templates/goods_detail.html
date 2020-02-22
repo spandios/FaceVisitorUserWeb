@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 디테일</title>
+    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../static/css/store.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="app" v-if="goods" @click="clickMenu">
+    <div class="header">
+        <!-- <div class="wrap_head"> 제거 -->
+        <div class="inner">
+            <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
+            <div class="gnb">
+                <ul class="service_menu">
+                    <li><a class="link" href="/self_pay">셀프결제</a></li>
+                </ul>
+                <div class="my_menu">
+                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
+                        <div class="layer_search">
+                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
+                        </div>
+                    </div>
+                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
+                        <div class="layer_menu">
+                            <ul class="menu">
+                                <li><a href="##">주문내역</a></li>
+                                <li><a href="##"></a></li>
+                            </ul>
+                            <a class="logout" href="#">로그아웃</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2 detail_view">
+        <h2 class="blind">상품 상세</h2>
+        <div class="section_detail">
+            <div class="inner">
+                <div class="photo">
+                    <div class="swiper-container product_photo">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"><img :src="goods.images[0].url"
+                                                           alt=""></div>
+                        </div>
+                    </div>
+                    <!--                    <div class="swiper-container product_thumbs">-->
+                    <!--                        <div class="swiper-wrapper">-->
+                    <!--                            <div class="swiper-slide"><img src="goods.images[0].url"-->
+                    <!--                                                           width="120" height="120" alt=""></div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                </div>
+                <div class="info">
+                    <!-- 20200109 수정 -->
+                    <div class="wrap_cont">
+                        <div class="cont">
+                            <span class="txt" style="padding-top: 16px;">{{goods.vendor}}</span>
+                            <strong class="tit" style="padding-top: 16px;">{{goods.name}}</strong>
+                            <span class="price" style="padding-top: 16px;"><!-- sale 클래스 추가 -->
+                                <span>$ {{goods.price}}</span>
+                            </span>
+                        </div>
+                        <div class="desc point_desc" style="padding-top: 16px;">
+                            <div style="padding-bottom: 8px">
+                                페이스 비지터의 셀프결제로 주문시
+                            </div>
+
+                            <div>
+                                <b style="font-size: 18px">7.0 %</b>  포인트 적립
+                            </div>
+                        </div>
+
+                        <div style="position: absolute; top:380px; left:58px;">
+                            <div class="wrap_btn">
+                                <button type="button" class="btn_comm" @click="addToCart">카트 담기</button>
+                                <button type="button" class="btn_comm primary" @click="order">셀프결제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section_list similar" style="margin-top: 12px;">
+            <div class="inner">
+                <h3 class="tit_comm noline">유사한 상품</h3>
+                <div class="swiper-container">
+                    <ul class="swiper-wrapper list_comm">
+                        <li class="swiper-slide" v-for="item of recommend" :key="item.id">
+                            <a :href="`/goods/${item.id}`" class="link_box">
+                                <span class="thumb"><img :src="item.images[0].url" width="262" height="238"
+                                                         alt=""></span>
+                                <span class="cont">
+                                    <span class="txt">{{item.vendor}}</span>
+                                    <strong class="tit">{{item.name}}</strong>
+                                    <span class="price"> <span v-if="item.beforeSalePrice>0"
+                                                               style="text-decoration : line-through;color: #9b9b9b; margin-right: 4px; margin-top: 4px; ">${{item.beforeSalePrice}}</span> $ {{item.price}}</span>
+                  </span>
+                            </a>
+                            <!--                <button type="button" class="btn_like" :class="{on : product.like}"-->
+                            <!--                        @click="likeProduct(product)"><span class="blind">좋아요</span>-->
+                            <!--                </button>-->
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn_slide btn_prev"><span class="blind">이전</span></button>
+                <button type="button" class="btn_slide btn_next"><span class="blind">다음</span></button>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    (% include 'partials/footer.html' %)
+</div>
+
+</body>
+</html>
+
+
+<script>
+
+    new Vue({
+        el: '#app',
+        data: {
+            goodsId: null,
+            goods: null,
+            recommend: null,
+            visibleMenu: false,
+        },
+        async created() {
+            this.goodsId = ((goods_id));
+            try {
+                const access_token = localStorage.getItem("access_token");
+                if (!access_token) {
+                    Swal.fire({
+                        text: "인증 되지 않았습니다.",
+                        icon: 'error',
+                    }).then(result => {
+                        if (result.value) {
+                            location.href = "/";
+                        }
+                    });
+                }
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+                var goodsResponse = await axios.get('http://localhost:5001/api/v1/user/goods/' + this.goodsId);
+                this.goods = goodsResponse.data;
+
+                var recommendResponse = await axios.get('http://localhost:5001/api/v1/user/goods/init/recommend');
+                this.recommend = recommendResponse.data;
+                console.log(this.recommend);
+
+            } catch (e) {
+                console.log(e.response.data);
+                Swal.fire({
+                    text: e.message,
+                    icon: 'error',
+                })
+            }
+            // Swal.close();
+
+        },
+        methods: {
+            addToCart() {
+
+            },
+            order() {
+            },
+
+            clickMenu(ref) {
+                if (ref.target.className == 'btn_mypage') {
+                    this.visibleMenu = !this.visibleMenu
+                } else {
+                    this.visibleMenu = false
+                }
+            }
+
+        },
+        async mounted() {
+            await new Promise(resolve => {
+                setTimeout(function () {
+                    resolve()
+                }, 500)
+
+            });
+
+            var similar = $('.similar');
+            if ($('.swiper-slide', similar).length > 4) {
+                $('button.btn_slide', similar).show();
+                var swiperTarget1 = new Swiper($('.swiper-container', similar), {
+                    slidesPerView: 4,
+                    navigation: {
+                        prevEl: $('.btn_prev', similar),
+                        nextEl: $('.btn_next', similar),
+                    }
+                });
+            }
+        }
+    });
+
+
+</script>
+
+<style scoped>
+    .wrap_btn {
+        display: flex;
+    }
+
+    .point_desc {
+        position: relative;
+        padding: 15px;
+        border-radius: 1px;
+        border: solid 1px #ccc;
+        background-color: #fafafa;
+        font-size: 14px;
+        color: #555;
+        width: 300px;
+    }
+</style>

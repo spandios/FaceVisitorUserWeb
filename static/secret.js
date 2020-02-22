@@ -1,0 +1,1 @@
+STRIPE_KEY = "pk_test_2UoOrX6dpNBGN8MPbAYUfeI600DpoLdoXZ";

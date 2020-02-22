@@ -19,8 +19,8 @@
             <h1 class="logo" style="margin-top: 16px;"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
             <div class="gnb">
                 <ul class="service_menu">
-                    <li><a class="link" href="##" style="color: white">셀프결제</a></li>
-                    <li><a class="link" href="##" style="color: white">장바구니</a></li>
+                    <li><a class="link" href="/self_pay" style="color: white">셀프결제</a></li>
+                    <li><a class="link" href="/cart" style="color: white">장바구니</a></li>
                     <li><a class="link" href="##" style="color: white">직원호출</a></li>
                 </ul>
                 <div class="my_menu">
@@ -111,9 +111,8 @@
             </div>
             <div class="rectangle_pay row align-items-center justify-content-center">
 
-                <div class="pay_text">
-                    셀프결제 하기
-                </div>
+                    <button class="pay_text" @click="toSelfPay" >셀프결제 하기</button>
+
             </div>
         </div>
 
@@ -219,14 +218,14 @@
                 <h2 class="tit_comm">구매하실 상품을 고르셨나요?</h2>
                 <div class="container text-center" style="margin-top: 16px;">
                     <div class="row">
-                        <div class="col" style="font-weight: bold; font-size: 18px;">
+                        <div class="col" style=" font-size: 18px;">
                             셀프결제로 더 빠르고 간편하게 결제해보세요!
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button class="btn_comm primary"
-                                    style="background-color:#0658fc;padding-left: 8px; padding-right:8px; font-size: 24px; font-weight: normal; margin-top: 24px;">
+                            <button class="btn_comm primary" @click="toSelfPay"
+                                    style="background-color:#0658fc;padding-left: 8px; padding-right:8px; font-size: 28px; font-weight: normal; margin-top: 24px;">
                                 셀프 결제하기
                             </button>
                         </div>
@@ -306,6 +305,9 @@
                 } else {
                     this.visibleMenu = false
                 }
+            },
+            toSelfPay(){
+                location.href= "/self_pay"
             }
         },
         async mounted() {
@@ -449,3 +451,4 @@
 </style>
 </body>
 </html>
+
