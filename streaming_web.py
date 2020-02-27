@@ -88,7 +88,7 @@ def login():
         else:
             return "얼굴을 인식하지 못했습니다", 400
     except Exception as e:
-        return e,500
+        return e, 500
 
 
 def gen(fr):
@@ -107,22 +107,41 @@ def video_feed():
 def get_main():
     return render_template('main.html')
 
+
 @app.route('/goods/<goods_id>')
 def get_goods_detail(goods_id):
-    return render_template('goods_detail.html', goods_id =goods_id)
+    return render_template('goods_detail.html', goods_id=goods_id)
+
 
 @app.route('/self_pay')
 def get_self_pay():
     return render_template('self_pay.html')
 
 
+@app.route('/direct_pay/<goods_id>')
+def get_direct_self_pay(goods_id):
+    return render_template('direct_pay.html',goods_id=goods_id)
+
+
+@app.route('/order/complete/<order_id>')
+def get_pay_complete(order_id):
+    return render_template('pay_complete.html', order_id=order_id)
+
+@app.route('/cart')
+def get_cart():
+    return render_template('cart.html')
+
+
+
 @app.route('/is_face_detected')
 def face_detectd():
     return jsonify(is_face_detected=faceObject.face_detected)
 
+
 @app.route('/test')
 def test():
     return render_template('./vue/dist/index.html')
+
 
 @app.route('/is_user')
 def is_user():
@@ -136,7 +155,8 @@ def is_user():
                                               headers=headers)
                 if loginResponse.status_code is 200:
                     return loginResponse.json()
-                else: return "요청 중 문제가 있습니다.", 400
+                else:
+                    return "요청 중 문제가 있습니다.", 400
             else:
                 return "요청 중 문제가 있습니다.", 400
         else:

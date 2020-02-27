@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <script src="../static/common.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
 </head>
 <body>
@@ -21,6 +22,8 @@
             <div class="gnb">
                 <ul class="service_menu">
                     <li><a class="link" href="/self_pay">셀프결제</a></li>
+                    <li><a class="link" href="##">장바구니</a></li>
+                    <li><a class="link" href="##">직원호출</a></li>
                 </ul>
                 <div class="my_menu">
                     <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
@@ -62,29 +65,30 @@
                     <!--                    </div>-->
                 </div>
                 <div class="info">
-                    <!-- 20200109 수정 -->
                     <div class="wrap_cont">
-                        <div class="cont">
+                        <div class="cont" style="position: relative">
+                            <span class="btn_like pointer" style="position: absolute; right: 10px" :class="{on : goods.like}"
+                                  @click="likeGoodsMethod"></span>
                             <span class="txt" style="padding-top: 16px;">{{goods.vendor}}</span>
                             <strong class="tit" style="padding-top: 16px;">{{goods.name}}</strong>
                             <span class="price" style="padding-top: 16px;"><!-- sale 클래스 추가 -->
-                                <span>$ {{goods.price}}</span>
+                                <span>{{goods.price}}원</span>
                             </span>
                         </div>
                         <div class="desc point_desc" style="padding-top: 16px;">
                             <div style="padding-bottom: 8px">
-                                페이스 비지터의 셀프결제로 주문시
+                                셀프결제로 주문시
                             </div>
 
                             <div>
-                                <b style="font-size: 18px">7.0 %</b>  포인트 적립
+                                <b style="font-size: 18px;color: #0658fc">7.0 %</b> 포인트 적립
                             </div>
                         </div>
 
                         <div style="position: absolute; top:380px; left:58px;">
                             <div class="wrap_btn">
-                                <button type="button" class="btn_comm" @click="addToCart">카트 담기</button>
-                                <button type="button" class="btn_comm primary" @click="order">셀프결제
+                                <button type="button" class="btn_comm" @click="addToCart">장바구니</button>
+                                <button type="button" class="btn_comm primary" @click="order">바로주문
                                 </button>
                             </div>
                         </div>
@@ -156,28 +160,82 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                var goodsResponse = await axios.get('http://localhost:5001/api/v1/user/goods/' + this.goodsId);
+                var goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + this.goodsId);
                 this.goods = goodsResponse.data;
 
-                var recommendResponse = await axios.get('http://localhost:5001/api/v1/user/goods/init/recommend');
+
+                var recommendResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend');
                 this.recommend = recommendResponse.data;
-                console.log(this.recommend);
+
+
+
+                var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
+                this.likeGoods = likeResponse.data;
+                if (this.likeGoods.length > 0) {
+                    this.likeGoods = this.likeGoods.map(likeGoods => likeGoods.id);
+                }
+
+                this.checkIsLikeForList(this.recommend);
+                this.likeGoods.forEach(id=>{
+                    if(this.goods.id == id){
+                        this.goods.like = true;
+                    }else{
+                        this.goods.like = false;
+                    }
+                })
+
 
             } catch (e) {
-                console.log(e.response.data);
-                Swal.fire({
-                    text: e.message,
-                    icon: 'error',
-                })
+                swalError(Swal, e);
             }
-            // Swal.close();
 
         },
         methods: {
-            addToCart() {
+            checkIsLikeForList(goodsList) {
+                if (goodsList.length > 0) {
+                    goodsList.forEach(goods => {
+                        this.likeGoods.forEach(id => {
+                            if (goods.id == id) {
+                                goods.like = true;
+                                console.log("yes like");
+                            }
+                        })
+                    })
+                }
+            },
 
+            likeGoodsMethod() {
+                axios.post('http://localhost:5001/api/v1/user/like/goods/' + this.goods.id).then(result => {
+                    const isLike = result.data;
+                    if (isLike) {
+                        this.goods.like = true;
+                        Swal.fire({text: '좋아요!', icon: 'success'})
+                    } else {
+                        this.goods.like = false;
+                        Swal.fire({text: '좋아요 취소!', icon: 'success'})
+                    }
+                }).catch(err => {
+                    swalError(Swal, err);
+                })
+            },
+            addToCart() {
+                const cart = {goods: this.goods, qty: 1}
+                axios.post('http://localhost:5001/api/v1/cart', cart).then(response => {
+                    console.log(response)
+                    Swal.fire({
+                        text: '장바구니에 추가했어요! 장바구니 목록으로 갈까요?',
+                        icon: 'success',
+                    }).then(result => {
+                        if (result.value) {
+                            location.href = "/cart";
+                        }
+                    })
+                }).catch(err => {
+                    swalError(Swal, err);
+                });
             },
             order() {
+                location.href = "/direct_pay/" + this.goods.id;
             },
 
             clickMenu(ref) {

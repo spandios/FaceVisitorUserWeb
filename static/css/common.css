@@ -77,7 +77,9 @@ img {
 .wrapper {
     min-width: 1120px
 }
-
+.pointer{
+    cursor: pointer;
+}
 .inner {
     position: relative;
     margin: 0 auto;
@@ -109,16 +111,17 @@ img {
 
 .header .logo a {
     display: block;
-    padding: 13px 0
+    padding: 18px 0
 }
 
 .header .logo a:before {
     display: block;
     width: 280px;
     height: 38px;
-    background: url('../images/logo-facevisitor-white.svg') no-repeat;
+    background: url('../images/logo_facevisitor_small.png') no-repeat;
     content: ""
 }
+
 
 .header .gnb {
     float: right
@@ -724,12 +727,18 @@ img {
     line-height: 52px;
     vertical-align: top;
     background: #e0e0e0;
-    text-align: center
+    text-align: center;
+    padding : 0 8px;
 }
 
 .btn_comm.primary {
     color: #fff;
     background: #00a2e1
+}
+
+.btn_comm.primary2 {
+    color: #fff;
+    background: #0658fc
 }
 
 .btn_comm.dark {

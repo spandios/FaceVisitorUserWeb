@@ -1,9 +1,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>셀프결제</title>
-
-
+    <title>장바구니</title>
+    <script src="/static/vue-good-table.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link href="/static/vue-good-table.css" rel="stylesheet">
     <meta charset="utf-8"/>
     <meta http-equiv="Content-Language" content="ko-KR"/>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
@@ -11,30 +12,30 @@
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link href="../static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <meta>
+
     <script src="../static/common.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
     <link href="../static/css/common.css" rel="stylesheet">
     <link href="../static/css/main_back.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <link href="/static/vue-good-table.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
     <script src="/static/secret.js"></script>
-    <script src="/static/jsQR.js"></script>
-    <script src="/static/vue-good-table.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
+    <link href="/static/css/common.css" rel="stylesheet">
+
 </head>
 <body>
-<div id="app" v-if="user">
+<div id="app" v-if="user ">
     <div class="header">
         <div class="inner">
             <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
             <div class="gnb">
                 <ul class="service_menu">
                     <li><a class="link" href="/self_pay">셀프결제</a></li>
-                    <li><a class="link" href="/cart">장바구니</a></li>
+                    <li><a class="link" href="##">장바구니</a></li>
                     <li><a class="link" href="##">직원호출</a></li>
                 </ul>
                 <div class="my_menu">
@@ -58,33 +59,27 @@
             </div>
         </div>
     </div>
-    <div id="content">
-        <canvas id="canvas"></canvas>
+    <div class="content_body" v-if="cart != null && cart.length>0">
         <div class="scan_product">
-            <div style="font-size: 18px;margin-top: 32px;"><b>QR인식 리스트</b></div>
+            <div style="font-size: 32px;margin-top: 32px;"><b>장바구니</b></div>
             <div class="qr_goods_list" style="margin-top: 24px">
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th scope="col"></th>
                         <th scope="col" style="text-align: center">상품정보</th>
                         <th scope="col" style="text-align: center">상품가격</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr style="height: 100px" v-for="item of goods_list">
-                        <th style="width: 10%">
-                            <div class="table_item_goods" style="justify-content: center;height: 100px">
-                                <input type="checkbox" v-model="item.selected">
-                            </div>
-                        </th>
+                    <tr style="height: 100px" v-for="item of cart">
                         <td style="width : 75%">
                             <div class="table_item_goods">
-                                <img :src="item.content.images[0].url" width="100" height="100"
-                                     @click="toGoods(item.id)" class="pointer">
+                                <img :src="item.goods.images[0].url" width="100" height="100"
+                                     @click="toGoods(item.goods.id)" class="pointer">
                                 <div class="goods_info">
+                                    <div>{{item.goods.vendor}}</div>
                                     <div class="goods_text">
-                                        {{item.content.name}}
+                                        {{item.goods.name}}
                                     </div>
                                 </div>
 
@@ -93,12 +88,13 @@
                         <td style="width : 15%">
                             <div class="table_item_goods"
                                  style="height: 100px; font-size: 18px; justify-content: center; position: relative;">
-                                <select class="qty" v-model="item.content.qty">
+                                <select class="qty" v-model="item.qty">
                                     <option v-for="qty of qtyList" :index="qty" :value="qty">{{qty}}</option>
                                 </select>
                                 <div>
-                                    {{qtyPrice(item.content)}} 원
+                                    {{qtyPrice(item)}} 원
                                 </div>
+                                <button class="delete_button" @click="deleteCart(item.id)">X</button>
                             </div>
                         </td>
                     </tr>
@@ -106,7 +102,6 @@
                 </table>
             </div>
         </div>
-
 
         <div class="total_price">
             <div style="font-size: 16px;">
@@ -140,11 +135,20 @@
         </div>
 
     </div>
+    <div v-else>
+        <div class="content_empty">
+            <div>
+                <img src="static/images/icon-empty-cart.png">
+                <div style="font-size: 20px; margin-top: 32px;">장바구니가 비었어요!</div>
+                <a href="/main"><button class="btn_comm primary" style="margin-top: 46px;margin-left: 8px; font-size: 24px;">상품 보러가기</button></a>
+            </div>
+        </div>
+    </div>
 
-
-    (% include 'partials/footer.html' %)
 </div>
 
+</div>
+(% include 'partials/footer.html' %)
 </body>
 </html>
 
@@ -154,7 +158,7 @@
             el: '#app',
             components: {},
             data: {
-                goods: null,
+                cart: null,
                 recommend: null,
                 visibleMenu: false,
                 status: 0,
@@ -183,6 +187,7 @@
                     }
 
                     this.usePoint = Number(val);
+
                 },
                 goods_list(goods) {
                     if (goods != null) {
@@ -206,6 +211,8 @@
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
                     const userResponse = await axios.get('http://localhost:5001/api/v1/user/me');
                     this.user = userResponse.data;
+
+
                     if (this.user == null) {
                         Swal.fire({
                             text: "인증 되지 않았습니다.",
@@ -215,9 +222,10 @@
                                 location.href = "/";
                             }
                         });
-
                     }
                     console.log(this.user);
+                    this.getCart();
+
 
                 } catch (e) {
                     console.log(e.response.data);
@@ -232,7 +240,7 @@
             computed: {
                 payPrice() {
                     var result = 0;
-                    let selected = this.goods_list.filter(goods => goods.selected === true).map(goods => goods.content);
+                    let selected = this.cart.map(cart => cart.goods);
                     selected.forEach(content => {
                         result += content.qtyPrice
                     });
@@ -247,14 +255,30 @@
                 }
             },
             methods: {
+                getCart() {
+                    axios.get('http://localhost:5001/api/v1/cart').then(result => {
+                        this.cart = result.data;
+                        console.log(this.cart);
+                    }).catch(err => {
+                        swalError(Swal, err);
+                    })
 
-                qtyPrice(goods) {
-                    var price = goods.qty * goods.price;
-                    goods.qtyPrice = price;
+                },
+                qtyPrice(cart) {
+                    var price = cart.qty * cart.goods.price;
+                    cart.goods.qtyPrice = price;
                     return price;
                 },
-
-                addToCart() {
+                deleteCart(id) {
+                    axios.delete('http://localhost:5001/api/v1/cart/' + id).then(result => {
+                        Swal.fire({
+                            text: '삭제완료',
+                            icon: 'success'
+                        });
+                        this.getCart();
+                    }).catch(err => {
+                        swalError(Swal, err);
+                    })
                 },
                 order() {
                     this.stripe.createToken(this.card).then(async result => {
@@ -266,7 +290,7 @@
                             return
                         }
 
-                        if (this.goods_list != null && this.goods_list.length > 0) {
+                        if (this.cart != null && this.cart.length > 0) {
                             const payRequest = {
                                 lineItems: [],
                                 payPrice: this.payPrice,
@@ -274,22 +298,28 @@
                                 stripeToken: "MyStripeTokenFaceVisitor"
                             };
 
-                            const lineItems = this.goods_list.map(goods => {
+                            const lineItems = this.cart.map(cart => {
                                 let lineItem = {};
-                                lineItem.goods = goods.content;
-                                lineItem.goodsName = goods.content.name;
-                                lineItem.goodsPrice = goods.content.price;
-                                lineItem.qty = goods.content.qty;
-                                lineItem.frontPrice = goods.content.qtyPrice;
+                                lineItem.goods = cart.goods;
+                                lineItem.goodsName = cart.goods.name;
+                                lineItem.goodsPrice = cart.goods.price;
+                                lineItem.qty = cart.qty;
+                                lineItem.frontPrice = cart.goods.qtyPrice;
                                 return lineItem;
                             });
+
                             payRequest.lineItems = lineItems;
 
                             axios.post('http://localhost:5001/api/v1/order/pay/multiple', payRequest).then(result => {
                                 Swal.fire({text: '결제를 완료했습니다', icon: 'success'}).then(r => {
-                                    const data = result.data;
-                                    const order_id = data.id;
-                                    location.href = "/order/complete/" + order_id;
+                                    axios.delete('http://localhost:5001/api/v1/cart/all').then(deleteAll => {
+                                        const data = result.data;
+                                        const order_id = data.id;
+                                        location.href = "/order/complete/" + order_id;
+                                    }).catch(err => {
+                                        swalError(Swal, err);
+                                    });
+
                                 })
                             }).catch(err => {
                                 if (err.response.status == 400) {
@@ -297,7 +327,6 @@
                                 } else {
                                     Swal.fire({text: '결제를 완료할 수 없습니다. ', icon: 'error'});
                                 }
-
                             })
 
                         } else {
@@ -318,13 +347,6 @@
 
             },
             async mounted() {
-
-                await new Promise(resolve => {
-                    setTimeout(function () {
-                        resolve()
-                    }, 800)
-                });
-
                 // this.goods_list.push({
                 //     id: 32,
                 //     selected: true,
@@ -335,91 +357,13 @@
                 //         price: 1000,
                 //     }
                 // });
-                // var goods = {};
-                // var {data} = await axios.get('http://localhost:5001/api/v1/goods/' + 1057);
-                //
-                // goods.id = data.id;
-                // goods.content = data;
-                // goods.content.qty = 1;
-                // goods.selected = true;
-                // this.goods_list.push(goods);
-                var video = document.createElement("video");
 
 
-                var canvasElement = document.getElementById("canvas");
-                var canvas = canvasElement.getContext("2d");
-
-                function drawLine(begin, end, color) {
-                    canvas.beginPath();
-                    canvas.moveTo(begin.x, begin.y);
-                    canvas.lineTo(end.x, end.y);
-                    canvas.lineWidth = 4;
-                    canvas.strokeStyle = color;
-                    canvas.stroke();
-                }
-
-                // Use facingMode: environment to attemt to get the front camera on phones
-                navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}).then(function (stream) {
-                    video.srcObject = stream;
-                    video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-                    video.play();
-                    requestAnimationFrame(tick);
+                await new Promise(resolve => {
+                    setTimeout(function () {
+                        resolve()
+                    }, 800)
                 });
-
-                async function tick() {
-                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                        canvasElement.hidden = false;
-
-                        canvasElement.height = video.videoHeight;
-                        canvasElement.width = video.videoWidth;
-                        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-                        var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                        var code = jsQR(imageData.data, imageData.width, imageData.height, {
-                            inversionAttempts: "dontInvert",
-                        });
-                        if (code) {
-                            if (code.data) {
-                                const goods_id = Number(code.data);
-                                if (!Number.isNaN(goods_id)) {
-                                    drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
-                                    drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
-                                    drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
-                                    drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
-                                    let index = vue.goods_list.findIndex(value => value.id == code.data);
-                                    if (index < 0) {
-                                        var goods = {};
-
-                                        var goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + code.data);
-                                        goods.id = code.data;
-                                        goods.content = goodsResponse.data;
-                                        goods.content.qty = 1;
-                                        goods.selected = true;
-                                        vue.goods_list.push(goods);
-                                        console.log(vue.goods_list)
-                                    }
-                                }
-                            }
-
-                        } else {
-
-                        }
-                    }
-                    requestAnimationFrame(tick);
-                }
-
-
-                var similar = $('.similar');
-                if ($('.swiper-slide', similar).length > 4) {
-                    $('button.btn_slide', similar).show();
-                    var swiperTarget1 = new Swiper($('.swiper-container', similar), {
-                        slidesPerView: 4,
-                        navigation: {
-                            prevEl: $('.btn_prev', similar),
-                            nextEl: $('.btn_next', similar),
-                        }
-                    });
-                }
-
 
                 const stripe = Stripe('pk_test_2UoOrX6dpNBGN8MPbAYUfeI600DpoLdoXZ');
                 this.stripe = stripe;
@@ -462,10 +406,22 @@
 
 <style scoped>
 
-    #content {
+    .delete_button {
+        margin-left: 24px;
+    }
+
+    .content_body {
         margin: 24px 0px;
         text-align: center;
         min-height: 800px;
+    }
+
+    .content_empty {
+        margin: 24px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 600px;
     }
 
     #canvas {

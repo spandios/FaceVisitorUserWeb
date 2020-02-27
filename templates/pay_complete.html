@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>결제완료</title>
+    <script src="/static/vue-good-table.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link href="/static/vue-good-table.css" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Language" content="ko-KR"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link href="../static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta>
+
+    <script src="../static/common.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
+    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../static/css/main_back.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <script src="/static/secret.js"></script>
+    <link href="/static/css/common.css" rel="stylesheet">
+
+</head>
+<body>
+<div id="app" style="min-height: 600px;">
+    (% include 'partials/header.html' %)
+    <div class="scan_product" style="margin: 32px;">
+        <div style="font-size: 32px;margin-top: 32px;">주문을 완료했어요!</div>
+        <div class="qr_goods_list" style="margin-top: 24px">
+            <table class="table table-striped" style="position: relative;width: 100%;">
+                <thead>
+                <tr>
+                    <th scope="col" style="text-align: center;">상품정보</th>
+                    <th scope="col" style="text-align: center;">상품가격</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr style="height: 100px" v-for="(item,index) of order.lineItems" :key="item.id">
+                    <td style="text-align: center;width: 75%;min-width: 75%">
+                        <div class="table_item_goods">
+                            <img :src="item.goods.images[0].url" width="100" height="100" @click="toGoods(item)" class="pointer">
+                            <div class="goods_info">
+                                <div class="goods_text">
+                                    {{item.goodsName}} {{item.qty}}개
+                                </div>
+                            </div>
+
+                        </div>
+                    </td>
+                    <td style="width : 10%">
+                        <div class="table_item_goods"
+                             style="height: 100px; font-size: 18px; justify-content: center; position: relative;">
+                            <div>
+                                {{item.frontPrice}} 원
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pay_result">
+            <h2><b>최종 결제정보</b></h2>
+            <div class="line pay_price">
+
+                <div class="title_sub">주문 합계</div>
+                <div class="title_value">{{order.originalPrice}}원 </div>
+            </div>
+
+            <div class="line pay_sale">
+                <span class="title_sub">할인 합계 </span> <span class="title_value">{{order.point != null ? order.point.pointValue : 0}}원 </span>
+            </div>
+
+            <div class="line">
+                <span class="title_sub">최종 주문 합계 </span> <span class="title_value"><b>{{order.payPrice}}원</b></span>
+            </div>
+
+            <div class="line">
+                <span class="title_sub">적립 된 포인트</span> <span class="title_value"><b>{{order.savePoint != null ? order.savePoint.pointValue : 0}}원</b></span>
+            </div>
+        </div>
+
+        <div>
+            <a href="/main">
+                <button class="btn_comm primary">다른 상품 보러가기</button>
+            </a>
+        </div>
+    </div>
+    (% include 'partials/footer.html' %)
+</div>
+</body>
+</html>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            visibleMenu: false,
+            order: null,
+        },
+        async created() {
+            try {
+                const access_token = localStorage.getItem("access_token");
+                if (!access_token) {
+                    Swal.fire({
+                        text: "인증 되지 않았습니다.",
+                        icon: 'error',
+                    }).then(result => {
+                        if (result.value) {
+                            location.href = "/";
+                        }
+                    });
+                }
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+                const orderResponse = await axios.get('http://localhost:5001/api/v1/order/' + ((order_id)));
+                this.order = orderResponse.data;
+                console.log(this.order);
+            } catch (e) {
+                console.log(e);
+            }
+
+        },
+        methods: {
+            toGoods(id){
+                location.href="/goods/"+id
+            }
+        },
+        async mounted() {
+            // Swal.showLoading();
+            await new Promise(resolve => {
+                setTimeout(function () {
+                    resolve()
+                }, 500)
+
+            });
+
+        },
+    });
+</script>
+<style>
+    .line {
+        width: 60%;
+        margin: 0 auto;
+        display: flex;
+    }
+
+    .title_sub {
+        font-size: 16px;
+        margin: 16px;
+        width: 30%;
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .normal_value{
+        font-size: 16px;
+        margin: 16px;
+        width: 70%;
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .title_value {
+        font-size: 16px;
+        margin: 16px;
+        width: 70%;
+        height: 24px;
+        line-height: 24px;
+    }
+
+
+    .pay_result {
+        border: 1px #6c757d solid;
+        width: 40%;
+        margin: 32px auto 16px auto;
+    }
+
+    .scan_product {
+        text-align: center;
+    }
+
+    .title {
+        margin-top: 8px;
+        font-size: 14px;
+    }
+
+    .bold {
+        color: #0658fc;
+    }
+
+    .table {
+        margin-bottom: 0px;
+    }
+
+    .qr_goods_list {
+        margin: 0 auto;
+        width: 1040px;
+        border: 1px solid #6c757d;
+    }
+
+
+    .table_item_goods {
+        display: flex;
+        align-items: center;
+    }
+
+    .goods_info {
+        padding: 16px 0px;
+        font-size: 18px;
+    }
+
+    .goods_text {
+        max-width: 600px;
+        height: 64px;
+        overflow: hidden;
+        margin-left: 24px;
+        text-overflow: ellipsis;
+    }
+
+
+    .qty {
+        width: 46px;
+        height: 46px;
+        position: absolute;
+        left: -30px;
+    }
+
+
+    .cart_goods_list {
+
+        margin: 0 auto;
+        margin-top: 14px;
+        width: 1040px;
+        border: 1px solid #6c757d;
+    }
+
+    .total_price {
+        background-color: #f6f6f6;
+        height: 120px;
+        margin: 24px auto;
+        width: 1040px;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+</style>
