@@ -30,36 +30,7 @@
 </head>
 <body>
 <div id="app" v-if="user && goods">
-    <div class="header">
-        <div class="inner">
-            <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
-            <div class="gnb">
-                <ul class="service_menu">
-                    <li><a class="link" href="/self_pay">셀프결제</a></li>
-                    <li><a class="link" href="##">장바구니</a></li>
-                    <li><a class="link" href="##">직원호출</a></li>
-                </ul>
-                <div class="my_menu">
-                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
-                        <div class="layer_search">
-                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
-                        </div>
-                    </div>
-                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
-                        <div class="layer_menu">
-                            <ul class="menu">
-                                <li><a href="##">주문내역</a></li>
-                                <li><a href="##"></a></li>
-                            </ul>
-                            <a class="logout" href="#">로그아웃</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    (% include 'partials/header.html' %)
     <div id="content">
         <div class="scan_product">
             <div style="font-size: 32px;margin-top: 32px;"><b>바로주문</b></div>
@@ -80,7 +51,10 @@
                                      class="pointer">
                                 <div class="goods_info">
                                     <div class="goods_text">
-                                        {{goods.name}}
+                                        <span style="font-size: 14px;">{{goods.vendor}}</span>
+                                        <div>
+                                            {{goods.name}}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -163,7 +137,7 @@
 
             watch: {
                 usePoint(val) {
-                    if(Number.isNaN(Number(val))){
+                    if (Number.isNaN(Number(val))) {
                         alert("올바른 포인트를 입력해주세요");
                         this.usePoint = 0;
                         return;

@@ -77,9 +77,11 @@
                                 <img :src="item.goods.images[0].url" width="100" height="100"
                                      @click="toGoods(item.goods.id)" class="pointer">
                                 <div class="goods_info">
-                                    <div>{{item.goods.vendor}}</div>
                                     <div class="goods_text">
-                                        {{item.goods.name}}
+                                        <span style="font-size: 14px;">{{item.goods.vendor}}</span>
+                                        <div>
+                                            {{item.goods.name}}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -140,7 +142,11 @@
             <div>
                 <img src="static/images/icon-empty-cart.png">
                 <div style="font-size: 20px; margin-top: 32px;">장바구니가 비었어요!</div>
-                <a href="/main"><button class="btn_comm primary" style="margin-top: 46px;margin-left: 8px; font-size: 24px;">상품 보러가기</button></a>
+                <a href="/main">
+                    <button class="btn_comm primary" style="margin-top: 46px;margin-left: 8px; font-size: 24px;">상품
+                        보러가기
+                    </button>
+                </a>
             </div>
         </div>
     </div>
@@ -266,7 +272,9 @@
                 },
                 qtyPrice(cart) {
                     var price = cart.qty * cart.goods.price;
-                    cart.goods.qtyPrice = price;
+                    // cart.goods.qtyPrice = price;
+                    vue.$set(cart.goods, 'qtyPrice', price);
+                    console.log(cart.goods.qtyPrice);
                     return price;
                 },
                 deleteCart(id) {
