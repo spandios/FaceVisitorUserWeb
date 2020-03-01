@@ -79,7 +79,7 @@
             name: '',
             phoneNumber: '',
             isFaceDetected: false,
-            visibleMenu : false,
+            visibleMenu: false,
         },
 
         created() {
@@ -128,10 +128,14 @@
                 try {
                     Swal.fire("얼굴 등록 중입니다. ");
                     Swal.showLoading();
-                    var faceJoinResponse = await axios.post('http://localhost:5000/auth/join', {user});
+                    var faceJoinResponse = await axios.post('http://localhost:5000/join', {user});
                     Swal.fire({
                         text: '가입되었습니다!!',
                         icon: 'success',
+                    }).then(function (result) {
+                        if(result){
+                            location.href="/login"
+                        }
                     });
 
                 } catch (err) {

@@ -83,14 +83,14 @@
                                 <img :src="item.content.images[0].url" width="100" height="100"
                                      @click="toGoods(item.id)" class="pointer">
                                 <div class="goods_info">
-                                      <div class="goods_info">
-                                    <div class="goods_text">
-                                        <span style="font-size: 14px;">{{item.content.vendor}}</span>
-                                        <div>
-                                            {{item.content.name}}
+                                    <div class="goods_info">
+                                        <div class="goods_text">
+                                            <span style="font-size: 14px;">{{item.content.vendor}}</span>
+                                            <div>
+                                                {{item.content.name}}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 </div>
 
                             </div>
@@ -170,6 +170,7 @@
                 cart_list: [],
                 usePoint: 0,
                 user: null,
+                errorGoodsId : [],
 
             },
 
@@ -391,21 +392,25 @@
                                     drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
                                     drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
                                     let index = vue.goods_list.findIndex(value => value.id == code.data);
-                                    if (index < 0) {
+                                    let errorIndex = vue.errorGoodsId.findIndex(value => value == code.data);
+                                    if (index < 0 && errorIndex <0) {
                                         var goods = {};
+                                        axios.get('http://localhost:5001/api/v1/goods/' + code.data).then(result => {
+                                            const data = result.data;
+                                            goods.id = code.data;
+                                            goods.content = data;
+                                            goods.content.qty = 1;
+                                            goods.selected = true;
+                                            vue.goods_list.push(goods);
+                                            console.log(vue.goods_list)
+                                        }).catch(err=>{
+                                            swalError(Swal,err);
+                                            vue.errorGoodsId.push(code.data);
+                                        });
 
-                                        var goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + code.data);
-                                        goods.id = code.data;
-                                        goods.content = goodsResponse.data;
-                                        goods.content.qty = 1;
-                                        goods.selected = true;
-                                        vue.goods_list.push(goods);
-                                        console.log(vue.goods_list)
                                     }
                                 }
                             }
-
-                        } else {
 
                         }
                     }
@@ -544,7 +549,7 @@
         text-overflow: ellipsis;
     }
 
-    .goods_text{
+    .goods_text {
         min-height: 100px;
     }
 

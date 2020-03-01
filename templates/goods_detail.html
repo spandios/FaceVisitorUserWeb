@@ -15,37 +15,7 @@
 </head>
 <body>
 <div id="app" v-if="goods" @click="clickMenu">
-    <div class="header">
-        <!-- <div class="wrap_head"> 제거 -->
-        <div class="inner">
-            <h1 class="logo"><a href="/"><span class="blind">MAISON TAILOR</span></a></h1>
-            <div class="gnb">
-                <ul class="service_menu">
-                    <li><a class="link" href="/self_pay">셀프결제</a></li>
-                    <li><a class="link" href="##">장바구니</a></li>
-                    <li><a class="link" href="##">직원호출</a></li>
-                </ul>
-                <div class="my_menu">
-                    <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
-                        <div class="layer_search">
-                            <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
-                        </div>
-                    </div>
-                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
-                        <div class="layer_menu">
-                            <ul class="menu">
-                                <li><a href="##">주문내역</a></li>
-                                <li><a href="##"></a></li>
-                            </ul>
-                            <a class="logout" href="#">로그아웃</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    (% include 'partials/header.html' %)
     <div class="container2 detail_view">
         <h2 class="blind">상품 상세</h2>
         <div class="section_detail">
@@ -67,7 +37,8 @@
                 <div class="info">
                     <div class="wrap_cont">
                         <div class="cont" style="position: relative">
-                            <span class="btn_like pointer" style="position: absolute; right: 10px" :class="{on : goods.like}"
+                            <span class="btn_like pointer" style="position: absolute; right: 10px"
+                                  :class="{on : goods.like}"
                                   @click="likeGoodsMethod"></span>
                             <span class="txt" style="padding-top: 16px;">{{goods.vendor}}</span>
                             <strong class="tit" style="padding-top: 16px;">{{goods.name}}</strong>
@@ -144,6 +115,7 @@
             goods: null,
             recommend: null,
             visibleMenu: false,
+            user: null,
         },
         async created() {
             this.goodsId = ((goods_id));
@@ -160,13 +132,15 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+                const userResponse = await axios.get('http://localhost:5001/api/v1/user/me');
+                this.user = userResponse.data;
+
                 var goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + this.goodsId);
                 this.goods = goodsResponse.data;
 
 
                 var recommendResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend');
                 this.recommend = recommendResponse.data;
-
 
 
                 var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
@@ -176,10 +150,10 @@
                 }
 
                 this.checkIsLikeForList(this.recommend);
-                this.likeGoods.forEach(id=>{
-                    if(this.goods.id == id){
+                this.likeGoods.forEach(id => {
+                    if (this.goods.id == id) {
                         this.goods.like = true;
-                    }else{
+                    } else {
                         this.goods.like = false;
                     }
                 })
@@ -219,7 +193,7 @@
                 })
             },
             addToCart() {
-                const cart = {goods: this.goods, qty: 1}
+                const cart = {goods: this.goods, qty: 1};
                 axios.post('http://localhost:5001/api/v1/cart', cart).then(response => {
                     console.log(response)
                     Swal.fire({

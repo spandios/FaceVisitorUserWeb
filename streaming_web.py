@@ -62,21 +62,6 @@ def get_login():
 
 @app.route('/login', methods=['POST'])
 def post_login():
-    # count = 0
-    # error_response = []
-    return login()
-    # while count < 3:
-    #     loginResponse = login()
-    #     if (loginResponse.status_code == 200):
-    #         return loginResponse.json(), 200
-    #     else:
-    #         error_response.append(loginResponse.json())
-    #         count += 1
-    # print(error_response)
-    # return '로그인에 실패했습니다.', 400
-
-
-def login():
     try:
         faceId = faceObject.find_face_by_byte(collectionId)
         if len(faceId) > 0:
@@ -89,6 +74,10 @@ def login():
             return "얼굴을 인식하지 못했습니다", 400
     except Exception as e:
         return e, 500
+
+#
+# def login():
+#
 
 
 def gen(fr):
@@ -132,15 +121,9 @@ def get_cart():
     return render_template('cart.html')
 
 
-
 @app.route('/is_face_detected')
 def face_detectd():
     return jsonify(is_face_detected=faceObject.face_detected)
-
-
-@app.route('/test')
-def test():
-    return render_template('./vue/dist/index.html')
 
 
 @app.route('/is_user')
@@ -166,7 +149,7 @@ def is_user():
         return "서버에 오류가 있습니다.", 400
 
 
-@app.route('/auth/join', methods=['POST'])
+@app.route('/join', methods=['POST'])
 def join():
     try:
         userJson = request.json['user']

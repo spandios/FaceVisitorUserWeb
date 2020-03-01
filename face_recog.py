@@ -167,7 +167,7 @@ class FaceRecog():
         process = []
         faceIds = []
         result = {}
-        while count < 3:
+        while count < 2:
             time.sleep(1)
             tempFrame = self.camera.get_frame()
             response = aws_rekog.add_face_to_collection(collection_id,self.get_jpg_bytes())

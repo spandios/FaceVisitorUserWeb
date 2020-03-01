@@ -14,7 +14,7 @@
 </head>
 <body>
 <div id="app">
-    <div class="wrapper" @click="clickMenu">
+    <div class="wrapper" >
         (% include 'partials/header.html' %)
         <div class="container2 login">
             <!-- 로그인 -->
@@ -61,7 +61,7 @@
         created() {
 
         },
-        mounted(){
+        mounted() {
 
         },
 
@@ -78,33 +78,27 @@
                         icon: 'success',
                     });
 
-                    localStorage.setItem("access_token",data.access_token);
-                    localStorage.setItem("refresh_token",data.refresh_token);
-                    axios.defaults.headers.common['Authorization'] = 'bearer '+data.access_token;
+                    localStorage.setItem("access_token", data.access_token);
+                    localStorage.setItem("refresh_token", data.refresh_token);
+                    axios.defaults.headers.common['Authorization'] = 'bearer ' + data.access_token;
                     location.href = "/main"
 
 
                 } catch (e) {
-                    if(err.response.data.length>50){
+                    if (err.response.data.length > 50) {
                         Swal.fire({
-                        text: "로그인에 실패했습니다. 다시 시도해주세요.",
-                        icon: 'error',
-                    });
-                    }else {
+                            text: "로그인에 실패했습니다. 다시 시도해주세요.",
+                            icon: 'error',
+                        });
+                    } else {
                         Swal.fire({
-                        text: err.response.data,
-                        icon: 'error',
-                    });
+                            text: err.response.data,
+                            icon: 'error',
+                        });
                     }
                 }
             },
-             clickMenu(ref){
-                if(ref.target.className == 'btn_mypage'){
-                    this.visibleMenu = !this.visibleMenu
-                }else{
-                    this.visibleMenu = false
-                }
-            }
+
         }
     });
 </script>
