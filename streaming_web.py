@@ -1,11 +1,11 @@
 # streaming_web.py
 
 import requests
-from flask import Flask, render_template, Response, jsonify, request, abort
+from flask import Flask, render_template, Response, jsonify, request
 from flask_cors import CORS
 
+import aws_personalize as personalize
 import face_recog
-import time
 
 collectionId = 'collection_test'
 headers = {'content-type': 'application/json'}
@@ -94,6 +94,7 @@ def video_feed():
 
 @app.route('/main')
 def get_main():
+
     return render_template('main.html')
 
 
@@ -147,6 +148,11 @@ def is_user():
     except Exception as e:
         print(e)
         return "서버에 오류가 있습니다.", 400
+
+
+@app.route('/personalize/<user_id>', methods=['GET'])
+def get_personalize(user_id):
+    return jsonify(personalize.getRecommendationByWebEvent(user_id))
 
 
 @app.route('/join', methods=['POST'])

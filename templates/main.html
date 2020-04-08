@@ -278,6 +278,9 @@
                 var {data} = await axios.get('http://localhost:5001/api/v1/user/me');
                 this.user = data;
 
+                var personalizeResponse = await axios.get('/personalize/' + this.user.id);
+                this.recommend
+
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
 
