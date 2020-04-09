@@ -299,10 +299,49 @@
                 console.log(this.history);
 
 
+                var recommend = $('.recommend');
+                if ($('.swiper-slide', recommend).length > 4) {
+                    $('button.btn_slide', recommend).show();
+                    var swiperTarget1 = new Swiper($('.swiper-container', recommend), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', recommend),
+                            nextEl: $('.btn_next', recommend),
+                        }
+                    });
+                }
+
+                var best = $('.best');
+                if ($('.swiper-slide', best).length > 4) {
+                    $('button.btn_slide', best).show();
+                    var swiperTarget2 = new Swiper($('.swiper-container', best), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', best),
+                            nextEl: $('.btn_next', best),
+                        }
+                    });
+                }
+
+
+                var history = $('.history');
+                if ($('.swiper-slide', history).length > 4) {
+                    $('button.btn_slide', history).show();
+                    var swiperTarget4 = new Swiper($('.swiper-container', history), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', history),
+                            nextEl: $('.btn_next', history),
+                        }
+                    });
+                }
+                Swal.close();
+
+
             } catch (e) {
                 console.log(e);
             }
-            Swal.close();
+
 
         },
         methods: {
@@ -356,53 +395,19 @@
                     swalError(Swal, err);
                 })
             }
+
+
         },
         async mounted() {
             // Swal.showLoading();
-            await new Promise(resolve => {
-                setTimeout(function () {
-                    resolve()
-                }, 1000)
-
-            });
-
-            var recommend = $('.recommend');
-            if ($('.swiper-slide', recommend).length > 4) {
-                $('button.btn_slide', recommend).show();
-                var swiperTarget1 = new Swiper($('.swiper-container', recommend), {
-                    slidesPerView: 4,
-                    navigation: {
-                        prevEl: $('.btn_prev', recommend),
-                        nextEl: $('.btn_next', recommend),
-                    }
-                });
-            }
-
-            var best = $('.best');
-            if ($('.swiper-slide', best).length > 4) {
-                $('button.btn_slide', best).show();
-                var swiperTarget2 = new Swiper($('.swiper-container', best), {
-                    slidesPerView: 4,
-                    navigation: {
-                        prevEl: $('.btn_prev', best),
-                        nextEl: $('.btn_next', best),
-                    }
-                });
-            }
+            // await new Promise(resolve => {
+            //     setTimeout(function () {
+            //         resolve()
+            //     }, 1000)
+            //
+            // });
 
 
-            var history = $('.history');
-            if ($('.swiper-slide', history).length > 4) {
-                $('button.btn_slide', history).show();
-                var swiperTarget4 = new Swiper($('.swiper-container', history), {
-                    slidesPerView: 4,
-                    navigation: {
-                        prevEl: $('.btn_prev', history),
-                        nextEl: $('.btn_next', history),
-                    }
-                });
-            }
-            Swal.close();
         },
     });
 
