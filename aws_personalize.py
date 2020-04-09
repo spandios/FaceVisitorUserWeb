@@ -8,57 +8,61 @@ session = boto3.Session(profile_name="face")
 client = session.client('personalize-events')
 personalize = session.client('personalize')
 personalizeRuntime = session.client('personalize-runtime')
+trackingId = '872bda53-fe70-4761-8704-69d357e47efa'
 
 
 def trackingViewEvent(userId, itemId):
-    client.put_events(
-        trackingId='872bda53-fe70-4761-8704-69d357e47efa',
-        userId=userId,
-        sessionId='session1',
-        eventList=[{
-            'eventId': 'event1',
-            'sentAt': datetime.datetime.now().timestamp(),
-            'eventType': 'view',
-            'properties': json.dumps({
-                'itemId': itemId,
-                'eventValue': 2,
-            })
-        }]
-    )
+    events = client.put_events(trackingId=trackingId, userId=str(userId),
+                               sessionId='session1',
+                               eventList=[{'eventId': 'event1', 'sentAt': datetime.datetime.now().timestamp(),
+                                           'eventType': 'VIEW',
+                                           'properties': json.dumps(
+                                               {'itemId': str(itemId), 'eventValue': 2})}])
+    print(events)
+
+
+def trackingLikeEvent(userId, itemId):
+    events = client.put_events(trackingId=trackingId, userId=str(userId),
+                               sessionId='session1',
+                               eventList=[{'eventId': 'event1', 'sentAt': datetime.datetime.now().timestamp(),
+                                           'eventType': 'LIKE',
+                                           'properties': json.dumps(
+                                               {'itemId': str(itemId), 'eventValue': 4})}])
+    print(events)
+    return events
+
+
+def trackingDisLikeEvent(userId, itemId):
+    events = client.put_events(trackingId=trackingId, userId=str(userId),
+                               sessionId='session1',
+                               eventList=[{'eventId': 'event1', 'sentAt': datetime.datetime.now().timestamp(),
+                                           'eventType': 'LIKE',
+                                           'properties': json.dumps(
+                                               {'itemId': str(itemId), 'eventValue': -4})}])
+    print(events)
+    return events
 
 
 def trackingCartEvent(userId, itemId):
-    client.put_events(
-        trackingId='872bda53-fe70-4761-8704-69d357e47efa',
-        userId=userId,
-        sessionId='session1',
-        eventList=[{
-            'eventId': 'event2',
-            'sentAt': datetime.datetime.now().timestamp(),
-            'eventType': 'cart',
-            'properties': json.dumps({
-                'itemId': itemId,
-                'eventValue': 5,
-            })
-        }]
-    )
+    events = client.put_events(trackingId=trackingId, userId=str(userId),
+                               sessionId='session1',
+                               eventList=[{'eventId': 'event1', 'sentAt': datetime.datetime.now().timestamp(),
+                                           'eventType': 'CART',
+                                           'properties': json.dumps(
+                                               {'itemId': str(itemId), 'eventValue': 5})}])
+    print(events)
+    return events
 
 
 def trackingOrderEvent(userId, itemId):
-    client.put_events(
-        trackingId='872bda53-fe70-4761-8704-69d357e47efa',
-        userId=userId,
-        sessionId='session1',
-        eventList=[{
-            'eventId': 'event3',
-            'sentAt': datetime.datetime.now().timestamp(),
-            'eventType': 'order',
-            'properties': json.dumps({
-                'itemId': itemId,
-                'eventValue': 10,
-            })
-        }]
-    )
+    events = client.put_events(trackingId=trackingId, userId=str(userId),
+                               sessionId='session1',
+                               eventList=[{'eventId': 'event1', 'sentAt': datetime.datetime.now().timestamp(),
+                                           'eventType': 'ORDER',
+                                           'properties': json.dumps(
+                                               {'itemId': str(itemId), 'eventValue': 10})}])
+    print(events)
+    return events
 
 
 def getRecommendationByWebEvent(userId):
@@ -83,4 +87,4 @@ def getRecommendationByFaceEvent():
 
 
 if __name__ == '__main__':
-    getRecommendationByWebEvent(1)
+    trackingViewEvent(1, 2300)

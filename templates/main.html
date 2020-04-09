@@ -278,25 +278,22 @@
                 var {data} = await axios.get('http://localhost:5001/api/v1/user/me');
                 this.user = data;
 
-                var personalizeResponse = await axios.get('/personalize/' + this.user.id);
-                this.recommend
+                var personalizeResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id);
+                this.recommend = personalizeResponse.data;
+                this.checkIsLikeForList(this.recommend);
 
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
-
                 console.log("매장 : " + this.store);
                 await this.getLikeGoods();
-                var recommendResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend');
-                this.recommend = recommendResponse.data;
-                this.checkIsLikeForList(this.recommend);
-                console.log(this.recommend);
+
 
                 var bestResponse = await axios.get('http://localhost:5001/api/v1/goods/init/best');
                 this.best = bestResponse.data;
                 this.checkIsLikeForList(this.best);
                 console.log(this.best);
 
-                var historyResponse = await axios.get('http://localhost:5001/api/v1/goods/init/history');
+                var historyResponse = await axios.get('http://localhost:5001/api/v1/user/history/goods');
                 this.history = historyResponse.data;
                 this.checkIsLikeForList(this.history);
                 console.log(this.history);
@@ -365,7 +362,7 @@
             await new Promise(resolve => {
                 setTimeout(function () {
                     resolve()
-                }, 500)
+                }, 1000)
 
             });
 
