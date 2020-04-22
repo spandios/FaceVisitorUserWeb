@@ -27,4 +27,4 @@ pip install -r requirements.txt
 python3 live_streaming.py
 
 ###DEMO
-![Alt Text](https://facevisitor-bucket2.s3.ap-northeast-2.amazonaws.com/ezgif.com-resize+(2).gif
+![Alt Text](https://facevisitor-bucket2.s3.ap-northeast-2.amazonaws.com/ezgif.com-resize+(1).gif)
