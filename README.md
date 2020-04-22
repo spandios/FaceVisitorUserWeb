@@ -20,11 +20,12 @@
 - QR코드를 통한 **셀프결제**
 
 
-###Install 
+## Install 
 pip install -r requirements.txt
 
 ###Start
 python3 live_streaming.py
 
-###DEMO
+##DEMO
+
 ![Alt Text](https://facevisitor-bucket2.s3.ap-northeast-2.amazonaws.com/ezgif.com-resize+(1).gif)
