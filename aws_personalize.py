@@ -8,7 +8,7 @@ session = boto3.Session(profile_name="face")
 client = session.client('personalize-events')
 personalize = session.client('personalize')
 personalizeRuntime = session.client('personalize-runtime')
-trackingId = '872bda53-fe70-4761-8704-69d357e47efa'
+trackingId = '97cd60b4-1c65-43fe-86fe-795c21ae2310'
 
 
 def trackingViewEvent(userId, itemId):

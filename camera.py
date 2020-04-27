@@ -26,7 +26,7 @@ class VideoCamera(object):
     def picture_shot(self, username, fr,s3 = False):
         cv2.imwrite(os.path.join(imagePath, username), fr)
         if s3:
-            return aws_s3.upload_file(os.path.join(imagePath, username),"facevisitor-bucket")
+            return aws_s3.upload_file(os.path.join(imagePath, username), "facevisitor-bucket2")
 
 # if __name__ == '__main__':
 #     cam = VideoCamera()

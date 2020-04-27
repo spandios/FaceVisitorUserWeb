@@ -96,6 +96,9 @@ def video_feed():
 def get_main():
     return render_template('main.html')
 
+@app.route('/goods/all')
+def get_goods_all():
+    return render_template('goods_all.html')
 
 @app.route('/goods/<goods_id>')
 def get_goods_detail(goods_id):

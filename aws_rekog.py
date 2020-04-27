@@ -1,6 +1,6 @@
-
-from botocore.exceptions import ClientError
 import boto3
+from botocore.exceptions import ClientError
+
 boto3.setup_default_session(profile_name='face')
 session = boto3.Session(profile_name="face")
 client = session.client('rekognition')
@@ -89,7 +89,7 @@ def deleteFaceById(faceId):
 def deleteAllFace():
     collection_id = 'collection_test'
     faceIds = list_faces_in_collection(collection_id)
-    print(faceIds)
+
     for faceId in faceIds:
         # if faceId is '27e6ac47-4b03-4ec2-80c5-6b56d6caad7b' or faceId is '47114780-5e37-4b03-9c4d-49158fc2e9a8' or faceId is 'f6c1cd9b-585e-4221-98fb-45952325954d':
         #     break

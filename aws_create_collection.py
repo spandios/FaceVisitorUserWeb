@@ -1,5 +1,5 @@
 import boto3
-
+boto3.setup_default_session(profile_name='face')
 
 def create_collection(collection_id):
     client = boto3.client('rekognition')
