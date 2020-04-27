@@ -209,6 +209,25 @@
         </div>
 
 
+        <div class="section_list">
+            <div class="inner">
+                <h2 class="tit_comm">상품을 검색하시겠어요?</h2>
+                <div class="container text-center" style="margin-top: 16px;">
+                    <div class="row">
+                        <div class="col" style="display: flex;justify-content: center; align-items: center">
+                            <input placeholder="상품명, 브랜드"
+                                   style="border-radius: 36px; background-color: #f9f6e3;padding-left: 8px; padding-right:8px; font-size: 24px; font-weight: normal; margin-top: 24px;"
+                                   v-model="searchKeyword"> <img @click="search" height="24px;"
+                                                                 src="/static/images/ico_search.png"
+                                                                 style="margin-top:16px; margin-left:8px;cursor: pointer"
+                                                                 width="24px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="section_list kitchen">
             <div class="inner">
                 <h2 class="tit_comm">구매하실 상품을 고르셨나요?</h2>
@@ -252,6 +271,7 @@
             best: [],
             history: [],
             likeGoods: [],
+            searchKeyword: '',
         },
         async created() {
 
@@ -279,19 +299,15 @@
 
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
-                console.log("매장 : " + this.store);
-
 
 
                 var bestResponse = await axios.get('http://localhost:5001/api/v1/goods/init/best');
                 this.best = bestResponse.data;
                 this.checkIsLikeForList(this.best);
-                console.log(this.best);
 
                 var historyResponse = await axios.get('http://localhost:5001/api/v1/user/history/goods');
                 this.history = historyResponse.data;
                 this.checkIsLikeForList(this.history);
-                console.log(this.history);
 
 
                 var recommend = $('.recommend');
@@ -340,10 +356,14 @@
 
         },
         methods: {
+            async search() {
+
+            },
             async getLikeGoods() {
                 try {
                     var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
                     this.likeGoods = likeResponse.data;
+                    console.log(this.likeGoods);
                     if (this.likeGoods.length > 0) {
                         this.likeGoods = this.likeGoods.map(likeGoods => likeGoods.id);
                     }

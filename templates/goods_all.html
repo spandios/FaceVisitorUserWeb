@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<div @click="clickMenu" class="wrapper main animated fadeIn" id="app" v-if="user && recommend">
+<div @click="clickMenu" class="wrapper main animated fadeIn" id="app" v-if="user && products">
     <div class="header" style="background-color: black; color:white;">
         <div class="inner">
             <h1 class="logo" style="margin-top: 16px;"><a href="/main"><span class="blind">MAISON TAILOR</span></a></h1>
@@ -109,7 +109,7 @@
             <div class="inner">
                 <h2 class="tit_comm">{{category=='recommend' ? '추천상품' : category=='best' ? '인기상품' : ''}} 모두보기</h2>
                 <ul class="list_comm" style="display: flex; flex-wrap: wrap">
-                    <li style="width:25%" v-for="item of recommend">
+                    <li style="width:25%" v-for="item of products">
                         <a :href=`/goods/${item.id}` class="link_box">
                                 <span class="thumb"><img :src="item.images[0].url" alt=""
                                                          height="238"
@@ -148,7 +148,7 @@
             user: null,
             store: null,
             storeId: 1,
-            recommend: [],
+            products: [],
             category: null,
         },
         async created() {
@@ -175,27 +175,21 @@
 
                 await this.getLikeGoods();
 
-                var personalizeResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id);
-                this.recommend = personalizeResponse.data;
-                this.checkIsLikeForList(this.recommend);
+                if (this.category == 'recommend') {
+                    var personalizeResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id);
+                    this.products = personalizeResponse.data;
+                } else if (this.category == 'best') {
+                    var bestResponse = await axios.get('http://localhost:5001/api/v1/goods/init/best');
+                    this.products = bestResponse.data;
+                    this.checkIsLikeForList(this.products);
+                }
+
+
+                this.checkIsLikeForList(this.products);
 
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
                 console.log("매장 : " + this.store);
-
-                var recommend = $('.recommend');
-                if ($('.swiper-slide', recommend).length > 4) {
-                    $('button.btn_slide', recommend).show();
-                    var swiperTarget1 = new Swiper($('.swiper-container', recommend), {
-                        slidesPerView: 4,
-                        navigation: {
-                            prevEl: $('.btn_prev', recommend),
-                            nextEl: $('.btn_next', recommend),
-                        }
-                    });
-                }
-                Swal.close();
-
 
             } catch (e) {
                 console.log(e);
