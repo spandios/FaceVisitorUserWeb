@@ -1,3 +1,4 @@
+`
 <html>
 <head>
     <meta charset="utf-8">
@@ -40,7 +41,6 @@
                 </ul>
                 <div class="my_menu">
                     <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
                         <div class="layer_search">
                             <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
                         </div>
@@ -52,7 +52,7 @@
                                 <li><a href="##">주문내역</a></li>
                                 <li><a href="##"></a></li>
                             </ul>
-                            <a class="logout" href="#">로그아웃</a>
+                            <a @click="logout" class="logout">로그아웃</a>
                         </div>
                     </div>
                 </div>
@@ -261,6 +261,10 @@
                 }
             },
             methods: {
+                logout() {
+                    localStorage.clear();
+                    location.href = "/";
+                },
                 getCart() {
                     axios.get('http://localhost:5001/api/v1/cart').then(result => {
                         this.cart = result.data;
@@ -553,4 +557,4 @@
     .StripeElement--webkit-autofill {
         background-color: #fefde5 !important;
     }
-</style>
+</style>`

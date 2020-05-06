@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<div @click="clickMenu" class="wrapper main animated fadeIn" id="app" v-if="user && products">
+<div @click="clickMenu" class="wrapper main animated fadeIn" id="app" v-if="user">
     <div class="header" style="background-color: black; color:white;">
         <div class="inner">
             <h1 class="logo" style="margin-top: 16px;"><a href="/main"><span class="blind">MAISON TAILOR</span></a></h1>
@@ -37,7 +37,7 @@
                                 <li><a href="##">주문내역</a></li>
                                 <li><a href="##"></a></li>
                             </ul>
-                            <a class="logout" href="#">로그아웃</a>
+                            <a @click="logout" class="logout">로그아웃</a>
                         </div>
                     </div>
                 </div>
@@ -79,57 +79,33 @@
     </div>
 
 
-    <div class="container2">
-        <div class="container d-flex flex-row">
-            <div class="rectangle">
-                <div class="store_intro ">
-                    <span class="store_intro_text ">{{store.name}} </span>
-                    <div style="display: flex; margin-top: 10px">
-                        <div style="margin : 14px 16px 0 0">
-                            고객님의 관심 상품은?
-                        </div>
+    <div class="container" style="padding: 64px" v-if="orderPage">
+        <div class="order_list" style="margin-top: 24px">
+            <div class="order_item" v-for="order of orderPage.content">
+                <div class="order_header"
+                     style="background: #f9f9f9; display: flex; justify-content: space-between; align-items: center; padding : 0 16px; min-height: 64px">
+                    <div style="font-size: 16px;">주문일자 : {{order.createdAt}}</div>
+                </div>
+                <div class="order_line" style="padding : 16px;">
+                    <div class="order_line_item" style="display: flex" v-for="lineItem of order.lineItems">
+                        <img :src="lineItem.goods.images[0].url" height="150" width="150">
+                        <div class="goods" style="margin-left: 16px; padding:16px;">
+                            <div class="vendor" style="font-size: 16px;">
+                                {{lineItem.goods.vendor}}
+                            </div>
+                            <div class="goods_name" style="font-size: 16px; font-weight: bold;">
+                                {{lineItem.goods.name}}
+                            </div>
 
-                        <div class="tags">
-                            <a class="link_tag" href="#"># IT기기</a>
-                            <a class="link_tag" href="#"># 육류</a>
-                            <a class="link_tag" href="#"># 마스크</a>
+                            <div class="goods_qty">
+                                {{lineItem.frontPrice}}원 / {{lineItem.qty}}개
+                            </div>
                         </div>
 
                     </div>
                 </div>
-
-
-            </div>
-            <div @click="toSelfPay" class="rectangle_pay row align-items-center justify-content-center">
-                <button class="pay_text">셀프결제 하기</button>
             </div>
         </div>
-
-        <div class="section_list recommend">
-            <div class="inner">
-                <h2 class="tit_comm">{{category=='recommend' ? '추천상품' : category=='best' ? '인기상품' : ''}} 모두보기</h2>
-                <ul class="list_comm" style="display: flex; flex-wrap: wrap">
-                    <li style="width:25%" v-for="item of products">
-                        <a :href=`/goods/${item.id}` class="link_box">
-                                <span class="thumb"><img :src="item.images[0].url" alt=""
-                                                         height="238"
-                                                         width="262"></span>
-                            <span class="cont">
-                                    <span class="txt">{{item.vendor}}</span>
-                                    <strong class="tit">{{item.name}}</strong>
-                                    <span class="price">{{item.price}}원</span>
-
-                                </span>
-                        </a>
-                        <button :class="{on: item.like}" @click="likeGoodsMethod(item)" class="btn_like pointer"
-                                type="button"><span
-                                class="blind">좋아요</span></button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-
     </div>
     (% include 'partials/footer.html' %)
 </div>
@@ -147,16 +123,17 @@
             user: null,
             store: null,
             storeId: 1,
-            products: [],
-            category: null,
+            recommend: [],
+            best: [],
+            history: [],
+            likeGoods: [],
+            keyword: '',
+            searchData: null,
+            orderPage: null,
         },
         async created() {
+
             try {
-                var params = {};
-                window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (str, key, value) {
-                    params[key] = value;
-                });
-                this.category = params['category'];
                 const access_token = localStorage.getItem("access_token");
                 if (!access_token) {
                     Swal.fire({
@@ -174,21 +151,12 @@
 
                 await this.getLikeGoods();
 
-                if (this.category == 'recommend') {
-                    var personalizeResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id);
-                    this.products = personalizeResponse.data;
-                } else if (this.category == 'best') {
-                    var bestResponse = await axios.get('http://localhost:5001/api/v1/goods/init/best');
-                    this.products = bestResponse.data;
-                    this.checkIsLikeForList(this.products);
-                }
-
-
-                this.checkIsLikeForList(this.products);
-
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
-                console.log("매장 : " + this.store);
+
+                var orderResponse = await axios.get('http://localhost:5001/api/v1/order');
+                this.orderPage = orderResponse.data;
+                console.log(this.orderPage.content);
 
             } catch (e) {
                 console.log(e);
@@ -197,10 +165,15 @@
 
         },
         methods: {
+            logout() {
+                localStorage.clear();
+                location.href = "/";
+            },
             async getLikeGoods() {
                 try {
                     var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
                     this.likeGoods = likeResponse.data;
+                    console.log(this.likeGoods);
                     if (this.likeGoods.length > 0) {
                         this.likeGoods = this.likeGoods.map(likeGoods => likeGoods.id);
                     }
@@ -208,21 +181,7 @@
                 } catch (e) {
                     swalError(Swal, e);
                 }
-
             },
-            checkIsLikeForList(goodsList) {
-                if (goodsList.length > 0) {
-                    goodsList.forEach(goods => {
-                        this.likeGoods.forEach(id => {
-                            if (goods.id === id) {
-                                goods.like = true;
-                                console.log("yes like");
-                            }
-                        })
-                    })
-                }
-            },
-
             clickMenu(ref) {
                 if (ref.target.className == 'btn_mypage') {
                     this.visibleMenu = !this.visibleMenu
@@ -233,24 +192,18 @@
             toSelfPay() {
                 location.href = "/self_pay"
             },
-            likeGoodsMethod(goods) {
-                axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(result => {
-                    const isLike = result.data;
-                    if (isLike) {
-                        goods.like = true;
-                        Swal.fire({text: '좋아요!', icon: 'success'})
-                    } else {
-                        goods.like = false;
-                        Swal.fire({text: '좋아요 취소!', icon: 'success'})
-                    }
-                }).catch(err => {
-                    swalError(Swal, err);
-                })
-            }
 
 
         },
-        mounted() {
+        async mounted() {
+            // Swal.showLoading();
+            // await new Promise(resolve => {
+            //     setTimeout(function () {
+            //         resolve()
+            //     }, 1000)
+            //
+            // });
+
 
         },
     });

@@ -39,7 +39,7 @@
                 </ul>
                 <div class="my_menu">
                     <div class="wrap_search"><!-- 검색 버튼 클릭시 on 클래스 추가 -->
-                        <button class="btn_search" type="button"><span class="blind">검색</span></button>
+
                         <div class="layer_search">
                             <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
                         </div>
@@ -51,7 +51,7 @@
                                 <li><a href="##">주문내역</a></li>
                                 <li><a href="##"></a></li>
                             </ul>
-                            <a class="logout" href="#">로그아웃</a>
+                            <a @click="logout" class="logout">로그아웃</a>
                         </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@
                 cart_list: [],
                 usePoint: 0,
                 user: null,
-                errorGoodsId : [],
+                errorGoodsId: [],
 
             },
 
@@ -253,6 +253,10 @@
                 }
             },
             methods: {
+                logout() {
+                    localStorage.clear();
+                    location.href = "/";
+                },
 
                 qtyPrice(goods) {
                     var price = goods.qty * goods.price;
@@ -393,7 +397,7 @@
                                     drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
                                     let index = vue.goods_list.findIndex(value => value.id == code.data);
                                     let errorIndex = vue.errorGoodsId.findIndex(value => value == code.data);
-                                    if (index < 0 && errorIndex <0) {
+                                    if (index < 0 && errorIndex < 0) {
                                         var goods = {};
                                         axios.get('http://localhost:5001/api/v1/goods/' + code.data).then(result => {
                                             const data = result.data;
@@ -403,8 +407,8 @@
                                             goods.selected = true;
                                             vue.goods_list.push(goods);
                                             console.log(vue.goods_list)
-                                        }).catch(err=>{
-                                            swalError(Swal,err);
+                                        }).catch(err => {
+                                            swalError(Swal, err);
                                             vue.errorGoodsId.push(code.data);
                                         });
 

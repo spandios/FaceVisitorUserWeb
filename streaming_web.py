@@ -114,6 +114,9 @@ def get_self_pay():
 def get_direct_self_pay(goods_id):
     return render_template('direct_pay.html',goods_id=goods_id)
 
+@app.route('/order')
+def get_order_page():
+    return render_template('order_page.html')
 
 @app.route('/order/complete/<order_id>')
 def get_pay_complete(order_id):

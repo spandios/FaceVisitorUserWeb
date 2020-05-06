@@ -7,6 +7,7 @@ import threading
 import time
 
 import boto3
+
 boto3.setup_default_session(profile_name='face')
 
 import cv2
@@ -25,6 +26,7 @@ session = boto3.Session(profile_name="face")
 client = session.client('rekognition')
 similarity = 0.4
 
+
 class FaceRecog():
 
     def __init__(self):
@@ -35,8 +37,23 @@ class FaceRecog():
 
         self.known_face_encodings = []
         self.known_face_names = []
-        #
+
         # # Load sample pictures and learn how to recognize it.
+
+        # Initialize some variables
+        self.face_locations = []
+        self.face_encodings = []
+        self.face_names = []
+        self.process_this_frame = True
+        self.face_detected = False
+        self.init_customer_face()
+        # 좋아요 계산
+        # self.cal_like()
+
+    def __del__(self):
+        del self.camera
+
+    def init_customer_face(self):
         dirname = 'customers'
         files = os.listdir(dirname)
         for filename in files:
@@ -49,18 +66,7 @@ class FaceRecog():
                 if len(face_recognition.face_encodings(img)) > 0:
                     face_encoding = face_recognition.face_encodings(img)[0]
                     self.known_face_encodings.append(face_encoding)
-        print(self.known_face_names)
-        # Initialize some variables
-        self.face_locations = []
-        self.face_encodings = []
-        self.face_names = []
-        self.process_this_frame = True
-        self.face_detected = False
-        # 좋아요 계산
-        # self.cal_like()
 
-    def __del__(self):
-        del self.camera
 
     def release(self):
         cv2.destroyAllWindows()
@@ -69,6 +75,7 @@ class FaceRecog():
         # Grab a single frame of video
 
         frame = self.camera.get_frame()
+
         # Resize frame of video to 1/4 size for faster face recognition processing
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
@@ -84,26 +91,37 @@ class FaceRecog():
             self.face_names = []
             for face_encoding in self.face_encodings:
                 # See if the face is a match for the known face(s)
+
                 distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
                 if len(distances) > 0:
                     min_value = min(distances)
+
                     # tolerance: How much distance between faces to consider it a match. Lower is more strict.
                     # 0.6 is typical best performance.
                     name = "NOT CUSTOMER"
                     if min_value < similarity:
                         index = np.argmin(distances)
                         name = self.known_face_names[index]
+                        print(self.camera.get_second_frame())
+                        # customerCount[name]['count'] = customerCount[name]['count'] + 1
+                        # customerCount[name]['last_time'] = self.now()
+                        # customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(), 'last_time': self.now()}
+
                         if name in customerCount:
-                            customerCount[name]['count'] = customerCount[name]['count'] + 1
-                            customerCount[name]['last_time'] = self.now()
+                            print(self.camera.get_second_frame())
+                            if self.camera.get_second_frame():
+                                print("ee")
+                                customerCount[name]['count'] = customerCount[name]['count'] + 1
+                                customerCount[name]['last_time'] = self.now()
+                                print("유사성 : " + str(min_value))
+                                print("현재 초 : " + str(time.localtime().tm_sec))
+                                print("카운트 :" + str(customerCount[name]['count']))
 
                         else:
-                            customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(),
-                                                   'last_time': self.now()}
+                            if self.camera.get_second_frame():
+                                customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(),
+                                                       'last_time': self.now()}
 
-                    # print("유사성 : " + str(min_value))
-                    # print("현재 초 : " + str(time.localtime().tm_sec))
-                    # print("카운트 :" + str(customerCountDataFrame[name]['count']))
                     # end = time.time()
                     # process_time = time.time() - start
 
@@ -167,10 +185,10 @@ class FaceRecog():
         process = []
         faceIds = []
         result = {}
-        while count < 2:
+        while count < 1:
             time.sleep(1)
             tempFrame = self.camera.get_frame()
-            response = aws_rekog.add_face_to_collection(collection_id,self.get_jpg_bytes())
+            response = aws_rekog.add_face_to_collection(collection_id, self.get_jpg_bytes())
             if len(response['UnindexedFaces']) > 0:
                 for unindexedFace in response['UnindexedFaces']:
                     if len(unindexedFace['Reasons']) > 0:
@@ -197,7 +215,10 @@ class FaceRecog():
         result['faceMeta'] = faceMeta
         result['faceImageUrl'] = []
         for idx, (pictureFrame, sharpness, faceId) in enumerate(process):
-            result['faceImageUrl'].append(self.camera.picture_shot(str(email) + "_" + str(idx) + ".jpg",pictureFrame,s3=True))
+            result['faceImageUrl'].append(
+                self.camera.picture_shot(str(email) + "_" + str(idx) + ".jpg", pictureFrame, s3=True))
+
+        self.init_customer_face()
         return result
 
     def find_face_by_byte(self, collection_id):
@@ -246,6 +267,7 @@ class FaceRecog():
 
 if __name__ == '__main__':
     face_recog = FaceRecog()
+
     while True:
         frame = face_recog.get_frame()
         # show the frame

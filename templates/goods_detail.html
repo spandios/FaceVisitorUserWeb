@@ -81,7 +81,7 @@
                                     <span class="txt">{{item.vendor}}</span>
                                     <strong class="tit">{{item.name}}</strong>
                                     <span class="price"> <span v-if="item.beforeSalePrice>0"
-                                                               style="text-decoration : line-through;color: #9b9b9b; margin-right: 4px; margin-top: 4px; ">${{item.beforeSalePrice}}</span> $ {{item.price}}</span>
+                                                               style="text-decoration : line-through;color: #9b9b9b; margin-right: 4px; margin-top: 4px; ">${{item.beforeSalePrice}}</span> $ {{item.price}}원</span>
                   </span>
                             </a>
                             <!--                <button type="button" class="btn_like" :class="{on : product.like}"-->
@@ -138,15 +138,25 @@
                 var goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + this.goodsId);
                 this.goods = goodsResponse.data;
 
-
                 var recommendResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend');
                 this.recommend = recommendResponse.data;
-
 
                 var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
                 this.likeGoods = likeResponse.data;
                 if (this.likeGoods.length > 0) {
                     this.likeGoods = this.likeGoods.map(likeGoods => likeGoods.id);
+                }
+
+                var similar = $('.similar');
+                if ($('.swiper-slide', similar).length > 4) {
+                    $('button.btn_slide', similar).show();
+                    var swiperTarget1 = new Swiper($('.swiper-container', similar), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', similar),
+                            nextEl: $('.btn_next', similar),
+                        }
+                    });
                 }
 
                 this.checkIsLikeForList(this.recommend);

@@ -14,6 +14,7 @@ import aws_s3
 class VideoCamera(object):
     def __init__(self, videoNum):
         self.video = cv2.VideoCapture(videoNum)
+        self.frame_rate = self.video.get(5)
 
     def __del__(self):
         self.video.release()
@@ -23,7 +24,13 @@ class VideoCamera(object):
         ret, frame = self.video.read()
         return frame
 
-    def picture_shot(self, username, fr,s3 = False):
+    def get_frame_id(self):
+        self.video.get(1)
+
+    def get_second_frame(self):
+        return self.get_frame_id() == self.frame_rate
+
+    def picture_shot(self, username, fr, s3=False):
         cv2.imwrite(os.path.join(imagePath, username), fr)
         if s3:
             return aws_s3.upload_file(os.path.join(imagePath, username), "facevisitor-bucket2")
