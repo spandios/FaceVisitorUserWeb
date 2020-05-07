@@ -285,6 +285,11 @@
                             };
 
                             const lineItems = this.goods_list.map(goods => {
+                                axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + goods.id + "/order").then(result => {
+                                    console.log(result)
+                                }).catch(err => {
+                                    console.log(err);
+                                })
                                 let lineItem = {};
                                 lineItem.goods = goods.content;
                                 lineItem.goodsName = goods.content.name;
@@ -295,7 +300,9 @@
                             });
                             payRequest.lineItems = lineItems;
 
+
                             axios.post('http://localhost:5001/api/v1/order/pay/multiple', payRequest).then(result => {
+
                                 Swal.fire({text: '결제를 완료했습니다', icon: 'success'}).then(r => {
                                     const data = result.data;
                                     const order_id = data.id;

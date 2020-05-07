@@ -255,8 +255,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
-.venv
 env/
 venv/
 ENV/
@@ -283,3 +281,4 @@ dmypy.json
 /node_modules/
 customers/**
 
+venv

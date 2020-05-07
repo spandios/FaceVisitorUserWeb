@@ -91,11 +91,13 @@ def deleteAllFace():
     faceIds = list_faces_in_collection(collection_id)
 
     for faceId in faceIds:
-        # if faceId is '27e6ac47-4b03-4ec2-80c5-6b56d6caad7b' or faceId is '47114780-5e37-4b03-9c4d-49158fc2e9a8' or faceId is 'f6c1cd9b-585e-4221-98fb-45952325954d':
-        #     break
+        if faceId is 'fd352c7e-75c6-4046-a0ca-e8cd6306ad43' or faceId is '66b308a2-e575-4cdf-b328-65fe63107af9':
+            continue
         deleteFaceById(faceId)
 
 
 if __name__ == "__main__":
-    # print(list_faces_in_collection('collection_test'))
     deleteAllFace()
+    # print(list_faces_in_collection('collection_test'))
+    # deleteAllFace()
+    # deleteFaceById('8cedb764-402e-4d87-bfc6-75cfdecf046f')

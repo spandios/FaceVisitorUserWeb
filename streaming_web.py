@@ -1,11 +1,15 @@
 # streaming_web.py
+import atexit
+import json
 
 import requests
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, Response, jsonify, request
 from flask_cors import CORS
 
 import aws_personalize as personalize
 import face_recog
+from Recommend import Recommend
 
 collectionId = 'collection_test'
 headers = {'content-type': 'application/json'}
@@ -38,6 +42,7 @@ app = CustomFlask(__name__)
 cors = CORS(app)
 
 faceObject = face_recog.FaceRecog()
+recommend = Recommend()
 
 
 @app.route('/')
@@ -75,6 +80,7 @@ def post_login():
     except Exception as e:
         return e, 500
 
+
 #
 # def login():
 #
@@ -96,9 +102,11 @@ def video_feed():
 def get_main():
     return render_template('main.html')
 
+
 @app.route('/goods/all')
 def get_goods_all():
     return render_template('goods_all.html')
+
 
 @app.route('/goods/<goods_id>')
 def get_goods_detail(goods_id):
@@ -110,17 +118,58 @@ def get_self_pay():
     return render_template('self_pay.html')
 
 
+@app.route('/recommend/<user_id>/<item_id>/<type>')
+def add_interaction(user_id, item_id, type):
+    user_id = int(user_id)
+    item_id = int(item_id)
+    recommend.add_interaction(user_id, item_id, type)
+    print("interaction subscribe user id : {} item id : {} type : {}".format(user_id, item_id, type))
+    return "true", 200
+
+
+@app.route('/recommend/<user_id>')
+def get_recommend(user_id):
+    user_id = int(user_id)
+
+    loginResponse = requests.post('http://localhost:5001/api/v1/goods/getGoods',
+                                  json={"goodsIds": recommend.get_recommend_by_user_id(user_id)},
+                                  headers=headers)
+
+    response = app.response_class(
+        response=json.dumps(loginResponse.json()),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
+
+
+@app.route('/recommend/pop')
+def get_popularity():
+    loginResponse = requests.post('http://localhost:5001/api/v1/goods/getGoods',
+                                  json={"goodsIds": recommend.get_popularity_item_id()}, headers=headers)
+    response = app.response_class(
+        response=json.dumps(loginResponse.json()),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
+
+
 @app.route('/direct_pay/<goods_id>')
 def get_direct_self_pay(goods_id):
-    return render_template('direct_pay.html',goods_id=goods_id)
+    return render_template('direct_pay.html', goods_id=goods_id)
+
 
 @app.route('/order')
 def get_order_page():
     return render_template('order_page.html')
 
+
 @app.route('/order/complete/<order_id>')
 def get_pay_complete(order_id):
     return render_template('pay_complete.html', order_id=order_id)
+
 
 @app.route('/cart')
 def get_cart():
@@ -152,7 +201,7 @@ def is_user():
             return "false", 200
     except Exception as e:
         print(e)
-        return "서버에 오류가 있습니다.", 400
+        return "서버에 오류가 있습니다.", 500
 
 
 @app.route('/personalize/<user_id>', methods=['GET'])
@@ -171,6 +220,7 @@ def join():
         # 이미 가입된 얼굴인지 체크
         # print(faceObject.find_face_by_byte('collection_test'))
         isMatch = faceObject.find_face_by_byte('collection_test')
+
         if isMatch is not None:
             return "이미 등록된 얼굴입니다. 로그인을 해주세요", 400
 
@@ -206,4 +256,10 @@ def join():
 
 
 if __name__ == '__main__':
+    # every 3 time retrain user interaction
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=recommend.train, trigger="interval", seconds=60 * 60 * 3)
+    scheduler.start()
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
     app.run(host='localhost', debug=True)

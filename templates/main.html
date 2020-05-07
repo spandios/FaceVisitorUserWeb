@@ -325,11 +325,15 @@
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
 
-                var personalizeResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id);
+                var personalizeResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id);
+                console.log(personalizeResponse.data);
+                if (personalizeResponse.data === 0) {
+                    var personalizeResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend/');
+                }
                 this.recommend = personalizeResponse.data;
                 this.checkIsLikeForList(this.recommend);
 
-                var bestResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id + "/pop");
+                var bestResponse = await axios.get('http://localhost:5000/recommend/pop');
                 this.best = bestResponse.data;
                 this.checkIsLikeForList(this.best);
 
@@ -438,6 +442,9 @@
                 axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(result => {
                     const isLike = result.data;
                     if (isLike) {
+                        axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + goods.id + "/like").then(likeInter=>{
+                            console.log(likeInter);
+                        })
                         goods.like = true;
                         Swal.fire({text: '좋아요!', icon: 'success'})
                     } else {

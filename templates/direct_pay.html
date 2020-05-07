@@ -235,7 +235,11 @@
                             };
 
                             console.log(payRequest)
-
+                            axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goods.id + "/order").then(result => {
+                                console.log(result)
+                            }).catch(err => {
+                                console.log(err);
+                            })
                             axios.post('http://localhost:5001/api/v1/order/pay', payRequest).then(result => {
                                 Swal.fire({text: '결제를 완료했습니다', icon: 'success'}).then(r => {
                                     const data = result.data;

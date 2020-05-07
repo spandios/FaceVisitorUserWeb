@@ -175,10 +175,10 @@
                 await this.getLikeGoods();
 
                 if (this.category == 'recommend') {
-                    var personalizeResponse = await axios.get('http://localhost:5001/api/v1/personalize/' + this.user.id);
+                    var personalizeResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id);
                     this.products = personalizeResponse.data;
                 } else if (this.category == 'best') {
-                    var bestResponse = await axios.get('http://localhost:5001/api/v1/goods/init/best');
+                    var bestResponse = await axios.get('http://localhost:5000/recommend/pop');
                     this.products = bestResponse.data;
                     this.checkIsLikeForList(this.products);
                 }
@@ -237,6 +237,7 @@
                 axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(result => {
                     const isLike = result.data;
                     if (isLike) {
+                        var viewResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goodsId + "/like");
                         goods.like = true;
                         Swal.fire({text: '좋아요!', icon: 'success'})
                     } else {
