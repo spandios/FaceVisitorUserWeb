@@ -1,3 +1,4 @@
+import csv
 import os
 from collections import defaultdict
 from time import time
@@ -109,10 +110,20 @@ class Recommend():
         with open(csv_name, 'a') as fd:
             fd.write("\n{},{},{},{}".format(uid, iid, value, int(time())))
 
+    def csv_to_dic(self):
+        with open(csv_name) as f:
+            tab_reader = csv.DictReader(f, delimiter=',')
+            for row in tab_reader:
+                user_id = row["user_id"]
+                item_id = row["item_id"]
+                value = row["rating"]
+                print(row)
+
 
 if __name__ == '__main__':
     recommend = Recommend()
-    recommend.get_recommend_by_user_id(6, 10)
+    # recommend.get_recommend_by_user_id(6, 10)
+    recommend.csv_to_dic()
     # recommend.add_interaction(10,2400,"view")
     # recommend.get_recommend_by_user_id(10, 10)
     # recommend.get_recommend_by_user_id(10, 10)

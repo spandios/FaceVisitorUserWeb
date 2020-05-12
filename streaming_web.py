@@ -130,9 +130,16 @@ def add_interaction(user_id, item_id, type):
 @app.route('/recommend/<user_id>')
 def get_recommend(user_id):
     user_id = int(user_id)
+    recommend_goods_id = recommend.get_recommend_by_user_id(user_id)
+    print(recommend_goods_id)
+    pop_response = None
+    if recommend_goods_id.lenth < 4:
+        popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
+        pop_response = popResponse.data
+        print(pop_response)
 
     loginResponse = requests.post('http://localhost:5001/api/v1/goods/getGoods',
-                                  json={"goodsIds": recommend.get_recommend_by_user_id(user_id)},
+                                  json={"goodsIds": recommend_goods_id},
                                   headers=headers)
 
     response = app.response_class(
@@ -256,7 +263,7 @@ def join():
 
 
 if __name__ == '__main__':
-    # every 3 time retrain user interaction
+    # every 3 hours re-train user interaction model(face_interaction.csv)
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=recommend.train, trigger="interval", seconds=60 * 60 * 3)
     scheduler.start()

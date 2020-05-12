@@ -30,11 +30,11 @@
                             <input class="inp_search" placeholder="찾는 제품이 있으신가요?" type="search">
                         </div>
                     </div>
-                    <div class="wrap_layer" :class="{on : visibleMenu}"><!-- MY 버튼 클릭시 on 클래스 추가 -->
+                    <div :class="{on : visibleMenu}" class="wrap_layer">
                         <button class="btn_mypage" type="button"><span class="blind">MY PAGE</span></button>
                         <div class="layer_menu">
                             <ul class="menu">
-                                <li><a href="##">주문내역</a></li>
+                                <li><a href="order">주문내역</a></li>
                                 <li><a href="##"></a></li>
                             </ul>
                             <a @click="logout" class="logout">로그아웃</a>
@@ -90,9 +90,8 @@
                         </div>
 
                         <div class="tags">
-                            <a class="link_tag" href="#"># IT기기</a>
-                            <a class="link_tag" href="#"># 육류</a>
-                            <a class="link_tag" href="#"># 마스크</a>
+                            <a class="link_tag" href="#"># 화장품</a>
+                            <a class="link_tag" href="#"># 헬스케어</a>
                         </div>
 
                     </div>

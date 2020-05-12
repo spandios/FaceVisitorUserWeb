@@ -174,10 +174,10 @@
 
                 await this.getLikeGoods();
 
-                if (this.category == 'recommend') {
+                if (this.category === 'recommend') {
                     var personalizeResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id);
                     this.products = personalizeResponse.data;
-                } else if (this.category == 'best') {
+                } else if (this.category === 'best') {
                     var bestResponse = await axios.get('http://localhost:5000/recommend/pop');
                     this.products = bestResponse.data;
                     this.checkIsLikeForList(this.products);
@@ -234,7 +234,7 @@
                 location.href = "/self_pay"
             },
             likeGoodsMethod(goods) {
-                axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(result => {
+                axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(async result => {
                     const isLike = result.data;
                     if (isLike) {
                         var viewResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goodsId + "/like");
