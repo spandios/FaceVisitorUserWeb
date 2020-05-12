@@ -131,19 +131,21 @@ def add_interaction(user_id, item_id, type):
 def get_recommend(user_id):
     user_id = int(user_id)
     recommend_goods_id = recommend.get_recommend_by_user_id(user_id)
-    print(recommend_goods_id)
-    pop_response = None
-    if recommend_goods_id.lenth < 4:
-        popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
-        pop_response = popResponse.data
-        print(pop_response)
+    if len(recommend_goods_id) == 0:
+        return []
 
-    loginResponse = requests.post('http://localhost:5001/api/v1/goods/getGoods',
-                                  json={"goodsIds": recommend_goods_id},
-                                  headers=headers)
+    recommend_response = requests.post('http://localhost:5001/api/v1/goods/getGoods',
+                                       json={"goodsIds": recommend_goods_id},
+                                       headers=headers)
+    recommend_result = recommend_response.json()
+
+    if 0 < len(recommend_goods_id) < 4:
+        popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
+        pop_result = popResponse.json()
+        recommend_result.extend(pop_result)
 
     response = app.response_class(
-        response=json.dumps(loginResponse.json()),
+        response=json.dumps(recommend_result),
         status=200,
         mimetype='application/json'
     )
