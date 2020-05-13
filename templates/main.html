@@ -6,14 +6,19 @@
     <meta content="ko-KR" http-equiv="Content-Language"/>
     <meta content="IE=Edge" http-equiv="X-UA-Compatible"/>
     <link href="/static/css/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
+
     <link href="/static/css/common.css" rel="stylesheet">
     <link href="/static/css/main_back.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css" rel="stylesheet">
 </head>
 <body>
 
-<div class="wrapper main animated fadeIn" id="app" @click="clickMenu" v-if="user">
+<div @click="clickMenu" class="wrapper main animated fadeIn" id="app" v-if="user && store && recommend && history">
     <div class="header" style="background-color: black; color:white;">
         <div class="inner">
             <h1 class="logo" style="margin-top: 16px;"><a href="/main"><span class="blind">MAISON TAILOR</span></a></h1>
@@ -198,8 +203,6 @@
                                     @click="likeGoodsMethod(item)"><span
                                     class="blind">좋아요</span></button>
                         </li>
-
-
                     </ul>
                 </div>
                 <button class="btn_slide btn_prev" type="button"><span class="blind">이전</span></button>
@@ -279,11 +282,7 @@
     </div>
     (% include 'partials/footer.html' %)
 </div>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+
 <script>
 
     new Vue({
@@ -324,12 +323,12 @@
                 var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
 
-                var personalizeResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id);
-                console.log(personalizeResponse.data);
-                if (personalizeResponse.data === 0) {
+                var recommendResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id);
+                console.log(recommendResponse)
+                if (recommendResponse.data.length === 0) {
                     var personalizeResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend/');
                 }
-                this.recommend = personalizeResponse.data;
+                this.recommend = recommendResponse.data;
                 this.checkIsLikeForList(this.recommend);
 
                 var bestResponse = await axios.get('http://localhost:5000/recommend/pop');
@@ -340,52 +339,14 @@
                 this.history = historyResponse.data;
                 this.checkIsLikeForList(this.history);
 
-
-                var recommend = $('.recommend');
-                if ($('.swiper-slide', recommend).length > 4) {
-                    $('button.btn_slide', recommend).show();
-                    var swiperTarget1 = new Swiper($('.swiper-container', recommend), {
-                        slidesPerView: 4,
-                        navigation: {
-                            prevEl: $('.btn_prev', recommend),
-                            nextEl: $('.btn_next', recommend),
-                        }
-                    });
-                }
-
-                var best = $('.best');
-                if ($('.swiper-slide', best).length > 4) {
-                    $('button.btn_slide', best).show();
-                    var swiperTarget2 = new Swiper($('.swiper-container', best), {
-                        slidesPerView: 4,
-                        navigation: {
-                            prevEl: $('.btn_prev', best),
-                            nextEl: $('.btn_next', best),
-                        }
-                    });
-                }
-
-
-                var history = $('.history');
-                if ($('.swiper-slide', history).length > 4) {
-                    $('button.btn_slide', history).show();
-                    var swiperTarget4 = new Swiper($('.swiper-container', history), {
-                        slidesPerView: 4,
-                        navigation: {
-                            prevEl: $('.btn_prev', history),
-                            nextEl: $('.btn_next', history),
-                        }
-                    });
-                }
-                Swal.close();
-
-
             } catch (e) {
                 console.log(e);
             }
 
 
         },
+
+
         methods: {
             logout() {
                 localStorage.clear();
@@ -441,7 +402,7 @@
                 axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(result => {
                     const isLike = result.data;
                     if (isLike) {
-                        axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + goods.id + "/like").then(likeInter=>{
+                        axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + goods.id + "/like").then(likeInter => {
                             console.log(likeInter);
                         })
                         goods.like = true;
@@ -457,15 +418,45 @@
 
 
         },
-        async mounted() {
-            // Swal.showLoading();
-            // await new Promise(resolve => {
-            //     setTimeout(function () {
-            //         resolve()
-            //     }, 1000)
-            //
-            // });
+        mounted() {
+            setTimeout(function () {
+                var recommend = $('.recommend');
+                if ($('.swiper-slide', recommend).length > 4) {
+                    $('button.btn_slide', recommend).show();
+                    var swiperTarget1 = new Swiper($('.swiper-container', recommend), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', recommend),
+                            nextEl: $('.btn_next', recommend),
+                        }
+                    });
+                }
 
+                var best = $('.best');
+                if ($('.swiper-slide', best).length > 4) {
+                    $('button.btn_slide', best).show();
+                    var swiperTarget2 = new Swiper($('.swiper-container', best), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', best),
+                            nextEl: $('.btn_next', best),
+                        }
+                    });
+                }
+
+                var history = $('.history');
+                console.log(history)
+                if ($('.swiper-slide', history).length > 4) {
+                    $('button.btn_slide', history).show();
+                    var swiperTarget4 = new Swiper($('.swiper-container', history), {
+                        slidesPerView: 4,
+                        navigation: {
+                            prevEl: $('.btn_prev', history),
+                            nextEl: $('.btn_next', history),
+                        }
+                    });
+                }
+            }, 500)
 
         },
     });
