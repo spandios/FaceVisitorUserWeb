@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+<input type="text" placeholder="이메일" id="email">
+<button onclick="login()">로그인</button>
+
+</body>
+<script>
+    async function login() {
+        var email_element = document.getElementById("email");
+        var email = email_element.value;
+        const response = await axios.post('http://localhost:5001/api/v1/auth/login_test', {email});
+        const data = response.data;
+        localStorage.clear()
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("refresh_token", data.refresh_token);
+        console.log(data);
+        // console.log(data);
+        location.href = "/main";
+
+    }
+</script>
+</html>

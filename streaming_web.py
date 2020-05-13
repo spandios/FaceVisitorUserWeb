@@ -64,6 +64,10 @@ def get_register():
 def get_login():
     return render_template('login.html')
 
+@app.route('/login_test')
+def get_loin_test():
+    return render_template('login_test.html')
+
 
 @app.route('/login', methods=['POST'])
 def post_login():
