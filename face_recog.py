@@ -105,7 +105,8 @@ class FaceRecog():
                         if is_test:
                             self.face_names.append("like count : {}".format(str(customerFaceCount[name]['count'])))
                         else :
-                            self.face_names.append(name)
+                            None
+                            # self.face_names.append(name)
 
 
         self.process_this_frame = not self.process_this_frame
@@ -240,7 +241,6 @@ class FaceRecog():
         return datetime.datetime.now().strftime("%y/%m/%d, %H:%M:%S")
 
     def facePreference(self):
-
         frame = self.camera.get_frame()
         if frame is not None:
             small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
