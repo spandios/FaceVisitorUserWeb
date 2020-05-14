@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title></title>
+    <meta charset="utf-8"/>
+    <meta content="ko-KR" http-equiv="Content-Language"/>
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible"/>
+
+    <link href="../static/css/common.css" rel="stylesheet">
+    <link href="../static/css/login.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+<div id="app">
+    <div class="wrapper" >
+        (% include 'partials/header.html' %)
+        <div class="container2 login">
+            <!-- 로그인 -->
+            <div class="main-content">
+                <h2 class="page-title">유저 선호도 테스트</h2>
+                <form v-on:submit.prevent>
+                    <div class="errors">{{errors}}</div>
+                    <div class="input-wrapper">
+                        <img id="bg" src="(( url_for('video_count') ))" style="width:300px; height:300px;">
+                    </div>
+                    <!--                    <div class="input-wrapper">-->
+                    <!--                        <input :value="errors" class="input-field" placeholder="비밀번호" type="password">-->
+                    <!--                    </div>-->
+                    <div class="input-wrapper">
+                        <button class="btn_submit" type="submit" @click="login">로그인</button>
+                    </div>
+
+                </form>
+                <div class="new-customer">
+                    <p>처음 방문이신가요?</p>
+                    <div class="input-wrapper">
+                        <a class="input-field" href="/register">서비스 시작하기</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        (% include 'partials/footer.html' %)
+    </div>
+</div>
+</body>
+</html>
+
+
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            password: '',
+            errors: '',
+        },
+        created() {
+
+        },
+        mounted() {
+
+        },
+
+        methods: {
+            async login() {
+                try {
+                    Swal.fire("얼굴 인식 중입니다. ");
+                    Swal.showLoading();
+                    var {data} = await axios.post('http://localhost:5000/login');
+
+                    Swal.hideLoading();
+                    Swal.fire({
+                        text: '로그인 되었습니다.',
+                        icon: 'success',
+                    });
+
+                    localStorage.setItem("access_token", data.access_token);
+                    localStorage.setItem("refresh_token", data.refresh_token);
+                    axios.defaults.headers.common['Authorization'] = 'bearer ' + data.access_token;
+                    location.href = "/main"
+
+
+                } catch (e) {
+                    if (err.response.data.length > 50) {
+                        Swal.fire({
+                            text: "로그인에 실패했습니다. 다시 시도해주세요.",
+                            icon: 'error',
+                        });
+                    } else {
+                        Swal.fire({
+                            text: err.response.data,
+                            icon: 'error',
+                        });
+                    }
+                }
+            },
+
+        }
+    });
+</script>
+

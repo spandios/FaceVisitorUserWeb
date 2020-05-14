@@ -23,8 +23,8 @@ def upload_file(file_name, bucket, object_name=None):
     s3_client = boto3.client('s3')
 
     try:
-        response = s3_client.upload_file(file_name, bucket, object_name,ExtraArgs={'ACL':'public-read'})
-        return "https://facevisitor-bucket2.s3.ap-northeast-2.amazonaws.com/customers/" + object_name
+        response = s3_client.upload_file(file_name, bucket, object_name,ExtraArgs={'ACL': 'public-read'})
+        return "https://facevisitor-bucket2.s3.ap-northeast-2.amazonaws.com/" + object_name
 
     except ClientError as e:
         logging.error(e)

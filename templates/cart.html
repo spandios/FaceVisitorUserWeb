@@ -164,6 +164,7 @@
             el: '#app',
             components: {},
             data: {
+                storeId:1,
                 cart: null,
                 recommend: null,
                 visibleMenu: false,
@@ -304,6 +305,7 @@
 
                         if (this.cart != null && this.cart.length > 0) {
                             const payRequest = {
+                                storeId:1,
                                 lineItems: [],
                                 payPrice: this.payPrice,
                                 usePoint: this.usePoint,

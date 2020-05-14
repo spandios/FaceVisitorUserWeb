@@ -124,6 +124,7 @@
             el: '#app',
             components: {},
             data: {
+                storeId : 1,
                 goods: null,
                 qtyList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 stripe: null,
@@ -226,6 +227,7 @@
 
                         if (this.goods != null && this.payPrice > 0) {
                             const payRequest = {
+                                storeId:this.storeId,
                                 goods: this.goods,
                                 payPrice: this.payPrice,
                                 usePoint: this.usePoint,

@@ -3,9 +3,9 @@
 import base64
 import datetime
 import os
-import threading
+import requests
 import time
-
+from Recommend import Recommend
 import boto3
 
 boto3.setup_default_session(profile_name='face')
@@ -17,7 +17,8 @@ import numpy as np
 import camera
 import aws_rekog
 
-customerCount = {}
+headers = {'content-type': 'application/json'}
+customerFaceCount = {}
 # customerCountDataFrame = pd.DataFrame(index=['count', 'like', 'start_time', 'end_time'])
 # print(customerCountDataFrame)
 fail_reason = ['EXCEEDS_MAX_FACES', 'EXTREME_POSE', 'LOW_BRIGHTNESS', 'LOW_SHARPNESS', 'LOW_CONFIDENCE',
@@ -25,7 +26,7 @@ fail_reason = ['EXCEEDS_MAX_FACES', 'EXTREME_POSE', 'LOW_BRIGHTNESS', 'LOW_SHARP
 session = boto3.Session(profile_name="face")
 client = session.client('rekognition')
 similarity = 0.4
-
+recommend = Recommend()
 
 class FaceRecog():
 
@@ -34,7 +35,7 @@ class FaceRecog():
         # from a webcam, comment the line below out and use a video file
         # instead.
         self.camera = camera.VideoCamera(0)
-
+        self.currentFace = None
         self.known_face_encodings = []
         self.known_face_names = []
 
@@ -48,7 +49,7 @@ class FaceRecog():
         self.face_detected = False
         self.init_customer_face()
         # 좋아요 계산
-        # self.cal_like()
+        self.cal_like()
 
     def __del__(self):
         del self.camera
@@ -71,9 +72,9 @@ class FaceRecog():
     def release(self):
         cv2.destroyAllWindows()
 
-    def get_frame(self):
+    def get_frame(self,is_test = False):
         # Grab a single frame of video
-
+        num = 0
         frame = self.camera.get_frame()
 
         # Resize frame of video to 1/4 size for faster face recognition processing
@@ -91,43 +92,21 @@ class FaceRecog():
             self.face_names = []
             for face_encoding in self.face_encodings:
                 # See if the face is a match for the known face(s)
-
                 distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
                 if len(distances) > 0:
                     min_value = min(distances)
-
                     # tolerance: How much distance between faces to consider it a match. Lower is more strict.
                     # 0.6 is typical best performance.
                     name = "NOT CUSTOMER"
                     if min_value < similarity:
                         index = np.argmin(distances)
                         name = self.known_face_names[index]
-                        print(self.camera.get_second_frame())
-                        # customerCount[name]['count'] = customerCount[name]['count'] + 1
-                        # customerCount[name]['last_time'] = self.now()
-                        # customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(), 'last_time': self.now()}
+                        # customerFaceCount[name]['count']
+                        if is_test:
+                            self.face_names.append("like count : {}".format(str(customerFaceCount[name]['count'])))
+                        else :
+                            self.face_names.append(name)
 
-                        if name in customerCount:
-                            print(self.camera.get_second_frame())
-                            if self.camera.get_second_frame():
-                                print("ee")
-                                customerCount[name]['count'] = customerCount[name]['count'] + 1
-                                customerCount[name]['last_time'] = self.now()
-                                print("유사성 : " + str(min_value))
-                                print("현재 초 : " + str(time.localtime().tm_sec))
-                                print("카운트 :" + str(customerCount[name]['count']))
-
-                        else:
-                            if self.camera.get_second_frame():
-                                customerCount[name] = {'count': 0, 'like': 0, 'start_time': self.now(),
-                                                       'last_time': self.now()}
-
-                    # end = time.time()
-                    # process_time = time.time() - start
-
-                    self.face_names.append(name)
-
-            # print(process_time)
 
         self.process_this_frame = not self.process_this_frame
 
@@ -167,6 +146,14 @@ class FaceRecog():
 
     def get_jpg_bytes(self):
         frame = self.get_frame()
+        # We are using Motion JPEG, but OpenCV defaults to capture raw images,
+        # so we must encode it into JPEG in order to correctly display the
+        # video stream.
+        ret, jpg = cv2.imencode('.jpg', frame)
+        return jpg.tobytes()
+
+    def get_jpg_bytes_test(self):
+        frame = self.get_frame(is_test=True)
         # We are using Motion JPEG, but OpenCV defaults to capture raw images,
         # so we must encode it into JPEG in order to correctly display the
         # video stream.
@@ -252,14 +239,54 @@ class FaceRecog():
     def now(self):
         return datetime.datetime.now().strftime("%y/%m/%d, %H:%M:%S")
 
+    def facePreference(self):
+
+        frame = self.camera.get_frame()
+        if frame is not None:
+            small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            rgb_small_frame = small_frame[:, :, ::-1]
+            self.face_locations = face_recognition.face_locations(rgb_small_frame)
+            self.face_encodings = face_recognition.face_encodings(rgb_small_frame, self.face_locations)
+            self.face_names = []
+            for face_encoding in self.face_encodings:
+                distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
+                if len(distances) > 0:
+                    min_value = min(distances)
+                    if min_value < similarity:
+                        index = np.argmin(distances)
+                        name = self.known_face_names[index]
+                        if name in customerFaceCount:
+                            if self.camera.get_second_frame():
+                                customerFaceCount[name]['count'] = customerFaceCount[name]['count'] + 1
+                                customerFaceCount[name]['timestamp'] = self.now()
+                                print("email : " + name)
+                                print("유사성 : " + str(min_value))
+                                print("현재 초 : " + str(time.localtime().tm_sec))
+                                print("카운트 :" + str(customerFaceCount[name]['count']))
+
+                        else: customerFaceCount[name] = {'count': 0, 'like': 0, 'timestamp': self.now()}
+
+        self.cal_like()
+
+
     def cal_like(self):
-        for email in customerCount:
-            count = customerCount[email]['count']
-            # 140 이하일 시 무시
-            if count is not None and count > 140:
-                customerCount[email]['like'] += count / 420
-                # 좋아요의 숫자는 머물었던 분
-        threading.Timer(60, self.cal_like).start()
+        for email in customerFaceCount:
+            count = customerFaceCount[email]['count']
+
+            if count is not None and count > 10:
+                response = requests.post('http://localhost:5001/api/v1/user/id',
+                                         json={"email": email},
+                                         headers=headers)
+                user_id = response.json()
+                response = requests.get('http://localhost:5001/api/v1/goods/goods-by-category',
+                                         json={"email": email},
+                                         headers=headers)
+                goods_id = response.json()
+                recommend.add_interaction(user_id,goods_id,"face")
+                print("user id : {}가 goods_id : {}에 관심 있습니다(점수10) ".format(user_id,goods_id))
+                customerFaceCount[email]['count'] = 0
+
+
 
     def login(self):
         faceIds = self.find_face_by_byte('collection_test')

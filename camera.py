@@ -28,7 +28,8 @@ class VideoCamera(object):
         self.video.get(1)
 
     def get_second_frame(self):
-        return self.get_frame_id() == self.frame_rate
+
+        return self.frame_rate
 
     def picture_shot(self, username, fr, s3=False):
         cv2.imwrite(os.path.join(imagePath, username), fr)

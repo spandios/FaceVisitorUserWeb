@@ -4,8 +4,9 @@ from collections import defaultdict
 from time import time
 
 import pandas as pd
-from surprise import Dataset, Reader
-from surprise import SVDpp
+from surprise import Dataset, Reader, SVDpp, SlopeOne, NormalPredictor, KNNBaseline, KNNBasic, KNNWithMeans, \
+    KNNWithZScore, BaselineOnly, CoClustering
+from surprise import SVD
 from surprise import dump
 # Dump 파일명
 from surprise.model_selection import cross_validate
@@ -21,21 +22,24 @@ class Recommend():
         self.train()
         self.predictions, self.algo = dump.load(file_name)
 
-    # def all_alo(self,data):
-    #     benchmark = []
-    #     # 모든 알고리즘을 literate화 시켜서 반복문을 실행시킨다.
-    #     for algorithm in [SVD(), SVDpp(), SlopeOne(), NMF(), NormalPredictor(), KNNBaseline(), KNNBasic(),
-    #                       KNNWithMeans(),
-    #                       KNNWithZScore(), BaselineOnly(), CoClustering()]:
-    #         # 교차검증을 수행하는 단계.
-    #         results = cross_validate(algorithm, data, measures=['RMSE'], cv=3, verbose=False)
-    #
-    #         # 결과 저장과 알고리즘 이름 추가.
-    #         tmp = pd.DataFrame.from_dict(results).mean(axis=0)
-    #         tmp = tmp.append(pd.Series([str(algorithm).split(' ')[0].split('.')[-1]], index=['Algorithm']))
-    #         benchmark.append(tmp)
-    #
-    #     print(pd.DataFrame(benchmark).set_index('Algorithm').sort_values('test_rmse'))
+    def all_alo(self):
+        self.df = pd.read_csv(csv_name)
+        reader = Reader(rating_scale=(1, 10))
+        data = Dataset.load_from_df(self.df[['user_id', 'item_id', 'rating']], reader)
+        benchmark = []
+        # 모든 알고리즘을 literate화 시켜서 반복문을 실행시킨다.
+        for algorithm in [SVD(), SVDpp(), SlopeOne(),NormalPredictor(), KNNBaseline(), KNNBasic(),
+                          KNNWithMeans(),
+                          KNNWithZScore(), BaselineOnly(), CoClustering()]:
+            # 교차검증을 수행하는 단계.
+            results = cross_validate(algorithm, data, measures=['RMSE'], cv=3, verbose=False)
+
+            # 결과 저장과 알고리즘 이름 추가.
+            tmp = pd.DataFrame.from_dict(results).mean(axis=0)
+            tmp = tmp.append(pd.Series([str(algorithm).split(' ')[0].split('.')[-1]], index=['Algorithm']))
+            benchmark.append(tmp)
+
+        print(pd.DataFrame(benchmark).set_index('Algorithm').sort_values('test_rmse'))
 
     def train(self):
         # 점수 1~ 10
@@ -44,7 +48,7 @@ class Recommend():
         data = Dataset.load_from_df(self.df[['user_id', 'item_id', 'rating']], reader)
         # TrainSet
         trainset = data.build_full_trainset()
-        algo = SVDpp()
+        algo = SVD()
         algo.fit(trainset)
         # TestSet
         testset = trainset.build_anti_testset()
@@ -59,17 +63,18 @@ class Recommend():
         dump.dump(file_name, predictions=predictions, algo=algo)
 
     def get_recommend_by_user_id(self, user_id, n=10):
-        ests = [(iid, est) for uid, iid, true_r, est, _ in self.predictions if uid == user_id]
         print("User ID :", user_id)
-        ests.sort(key=lambda x: x[1], reverse=True)
-        results = ests[:n]
+        ests = [(iid, est) for uid, iid, true_r, est, _ in self.predictions if uid == user_id]
+        if ests is not None:
+            ests.sort(key=lambda x: x[1], reverse=True)
+            results = ests[:n]
 
-        for (iid, est) in results:
-            print("Item id : ", iid, "Estimate Value : ", est)
+            for (iid, est) in results:
+                print("Item id : ", iid, "Estimate Value : ", est)
 
-        item_id = [result[0] for result in results]
-        return item_id
-
+            item_id = [result[0] for result in results]
+            return item_id
+        else: return []
     def get_popularity_item_id(self, n=10):
 
         item_list = []
@@ -78,7 +83,7 @@ class Recommend():
             item_list.append((row.name, row['user_id']))
         item_list.sort(key=lambda x: x[1], reverse=True)
         item_id = [result[0] for result in item_list[:n]]
-        print(item_id)
+        print("pop" + str(item_id))
         return item_id
 
     def get_top_n(self, n=10):
@@ -122,8 +127,9 @@ class Recommend():
 
 if __name__ == '__main__':
     recommend = Recommend()
+    recommend.all_alo()
     # recommend.get_recommend_by_user_id(6, 10)
-    recommend.csv_to_dic()
+
     # recommend.add_interaction(10,2400,"view")
     # recommend.get_recommend_by_user_id(10, 10)
     # recommend.get_recommend_by_user_id(10, 10)

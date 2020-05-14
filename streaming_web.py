@@ -64,6 +64,7 @@ def get_register():
 def get_login():
     return render_template('login.html')
 
+
 @app.route('/login_test')
 def get_loin_test():
     return render_template('login_test.html')
@@ -90,9 +91,12 @@ def post_login():
 #
 
 
-def gen(fr):
+def gen(fr,is_test = False):
     while True:
-        jpg_bytes = fr.get_jpg_bytes()
+        if is_test :
+            jpg_bytes = fr.get_jpg_bytes_test()
+        else :
+            jpg_bytes = fr.get_jpg_bytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + jpg_bytes + b'\r\n\r\n')
 
@@ -101,6 +105,13 @@ def gen(fr):
 def video_feed():
     return Response(gen(faceObject), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/video_count')
+def video_count():
+    return Response(gen(faceObject,is_test=True), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/count_test')
+def video_feed_test_template():
+    return render_template('count_test.html')
 
 @app.route('/main')
 def get_main():
@@ -135,26 +146,37 @@ def add_interaction(user_id, item_id, type):
 def get_recommend(user_id):
     user_id = int(user_id)
     recommend_goods_id = recommend.get_recommend_by_user_id(user_id)
-    if len(recommend_goods_id) == 0:
-        return []
 
-    recommend_response = requests.post('http://localhost:5001/api/v1/goods/getGoods',
-                                       json={"goodsIds": recommend_goods_id},
-                                       headers=headers)
-    recommend_result = recommend_response.json()
 
-    if 0 < len(recommend_goods_id) < 4:
+    if not recommend_goods_id:
+        print("empty recommend")
         popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
-        pop_result = popResponse.json()
-        recommend_result.extend(pop_result)
 
-    response = app.response_class(
-        response=json.dumps(recommend_result),
-        status=200,
-        mimetype='application/json'
-    )
+        return app.response_class(
+            response=json.dumps(popResponse.json()),
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        print("recommend exist")
+        recommend_response = requests.post('http://localhost:5001/api/v1/goods/getGoods',
+                                           json={"goodsIds": recommend_goods_id},
+                                           headers=headers)
+        recommend_result = recommend_response.json()
 
-    return response
+        if 0 < len(recommend_goods_id) < 4:
+            print("recommend + pop")
+            popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
+            pop_result = popResponse.json()
+            recommend_result.extend(pop_result)
+
+        response = app.response_class(
+            response=json.dumps(recommend_result),
+            status=200,
+            mimetype='application/json'
+        )
+
+        return response
 
 
 @app.route('/recommend/pop')
@@ -230,12 +252,14 @@ def join():
         password = userJson['password']
         phone = userJson['phone']
         name = userJson['name']
+        storeId = userJson['storeId']
+        print(storeId)
         # 이미 가입된 얼굴인지 체크
         # print(faceObject.find_face_by_byte('collection_test'))
-        isMatch = faceObject.find_face_by_byte('collection_test')
-
-        if isMatch is not None:
-            return "이미 등록된 얼굴입니다. 로그인을 해주세요", 400
+        # isMatch = faceObject.find_face_by_byte('collection_test')
+        #
+        # if isMatch is not None:
+        #     return "이미 등록된 얼굴입니다. 로그인을 해주세요", 400
 
         response = requests.post('http://localhost:5001/api/v1/user/exist', json={"email": email}, headers=headers)
         exist = response.json()
@@ -243,13 +267,13 @@ def join():
             return "이미 가입된 이메일입니다.", 400
 
         #  isMatch = None
-        if isMatch is None and exist is False:
+        if exist is False:
             print("가입되지않은 회원")
             result = faceObject.add_faces_to_collection(email, 'collection_test')
             print(result)
 
             response = requests.post('http://localhost:5001/api/v1/auth/join',
-                                     json={"email": email, "password": password, "phone": phone, "name": name,
+                                     json={"email": email, "password": password, "phone": phone, "name": name,"storeId": storeId,
                                            "faceIds": result['faceIds'], "lowAge": result['faceMeta']['lowAge'],
                                            "highAge": result['faceMeta']['highAge'],
                                            "gender": result['faceMeta']['gender'],
@@ -272,7 +296,9 @@ if __name__ == '__main__':
     # every 3 hours re-train user interaction model(face_interaction.csv)
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=recommend.train, trigger="interval", seconds=60 * 60 * 3)
+    # every 1 seconds tracking user face
+    scheduler.add_job(func=faceObject.facePreference, trigger="interval", seconds=1)
     scheduler.start()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
-    app.run(host='localhost', debug=True)
+    app.run(host='localhost', debug=True, use_reloader=False)

@@ -169,8 +169,10 @@
                 goods_list: [],
                 cart_list: [],
                 usePoint: 0,
+                storeId: 1,
                 user: null,
                 errorGoodsId: [],
+                processingQr : false,
 
             },
 
@@ -278,6 +280,7 @@
 
                         if (this.goods_list != null && this.goods_list.length > 0) {
                             const payRequest = {
+                                storeId:this.storeId,
                                 lineItems: [],
                                 payPrice: this.payPrice,
                                 usePoint: this.usePoint,
@@ -285,11 +288,14 @@
                             };
 
                             const lineItems = this.goods_list.map(goods => {
+
+                                //interaction
                                 axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + goods.id + "/order").then(result => {
                                     console.log(result)
                                 }).catch(err => {
                                     console.log(err);
                                 })
+
                                 let lineItem = {};
                                 lineItem.goods = goods.content;
                                 lineItem.goodsName = goods.content.name;
@@ -298,6 +304,7 @@
                                 lineItem.frontPrice = goods.content.qtyPrice;
                                 return lineItem;
                             });
+
                             payRequest.lineItems = lineItems;
 
 
@@ -396,8 +403,10 @@
                         });
                         if (code) {
                             if (code.data) {
+
                                 const goods_id = Number(code.data);
-                                if (!Number.isNaN(goods_id)) {
+                                if (!Number.isNaN(goods_id) && vue.processingQr === false) {
+                                    vue.processingQr = true;
                                     drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
                                     drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
                                     drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
@@ -413,6 +422,7 @@
                                             goods.content.qty = 1;
                                             goods.selected = true;
                                             vue.goods_list.push(goods);
+                                            vue.processingQr = false;
                                             console.log(vue.goods_list)
                                         }).catch(err => {
                                             swalError(Swal, err);
