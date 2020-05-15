@@ -120,7 +120,7 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                const orderResponse = await axios.get('http://localhost:5001/api/v1/order/' + ((order_id)));
+                const orderResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/order/' + ((order_id)));
                 this.order = orderResponse.data;
                 console.log(this.order);
             } catch (e) {

@@ -168,7 +168,7 @@
                         });
                     }
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                    const userResponse = await axios.get('http://localhost:5001/api/v1/user/me');
+                    const userResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                     this.user = userResponse.data;
                     if (this.user == null) {
                         Swal.fire({
@@ -180,7 +180,7 @@
                             }
                         });
                     }
-                    const goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + ((goods_id)));
+                    const goodsResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/goods/' + ((goods_id)));
                     this.goods = goodsResponse.data;
 
                 } catch (e) {
@@ -242,7 +242,7 @@
                             }).catch(err => {
                                 console.log(err);
                             })
-                            axios.post('http://localhost:5001/api/v1/order/pay', payRequest).then(result => {
+                            axios.post('http://api.facevisitor.co.kr/api/v1/order/pay', payRequest).then(result => {
                                 Swal.fire({text: '결제를 완료했습니다', icon: 'success'}).then(r => {
                                     const data = result.data;
                                     const order_id = data.id;

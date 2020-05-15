@@ -15,7 +15,7 @@
     async function login() {
         var email_element = document.getElementById("email");
         var email = email_element.value;
-        const response = await axios.post('http://localhost:5001/api/v1/auth/login_test', {email});
+        const response = await axios.post('http://api.facevisitor.co.kr/api/v1/auth/login_test', {email});
         const data = response.data;
         localStorage.clear()
         localStorage.setItem("access_token", data.access_token);

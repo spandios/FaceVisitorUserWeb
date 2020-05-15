@@ -146,15 +146,15 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                var {data} = await axios.get('http://localhost:5001/api/v1/user/me');
+                var {data} = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                 this.user = data;
 
                 await this.getLikeGoods();
 
-                var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
+                var storeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
 
-                var orderResponse = await axios.get('http://localhost:5001/api/v1/order');
+                var orderResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/order');
                 this.orderPage = orderResponse.data;
                 console.log(this.orderPage.content);
 
@@ -171,7 +171,7 @@
             },
             async getLikeGoods() {
                 try {
-                    var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
+                    var likeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/like/goods');
                     this.likeGoods = likeResponse.data;
                     console.log(this.likeGoods);
                     if (this.likeGoods.length > 0) {

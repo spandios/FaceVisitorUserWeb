@@ -169,7 +169,7 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                var {data} = await axios.get('http://localhost:5001/api/v1/user/me');
+                var {data} = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                 this.user = data;
 
                 await this.getLikeGoods();
@@ -186,7 +186,7 @@
 
                 this.checkIsLikeForList(this.products);
 
-                var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
+                var storeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
                 console.log("매장 : " + this.store);
 
@@ -199,7 +199,7 @@
         methods: {
             async getLikeGoods() {
                 try {
-                    var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
+                    var likeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/like/goods');
                     this.likeGoods = likeResponse.data;
                     if (this.likeGoods.length > 0) {
                         this.likeGoods = this.likeGoods.map(likeGoods => likeGoods.id);
@@ -234,7 +234,7 @@
                 location.href = "/self_pay"
             },
             likeGoodsMethod(goods) {
-                axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(async result => {
+                axios.post('http://api.facevisitor.co.kr/api/v1/user/like/goods/' + goods.id).then(async result => {
                     const isLike = result.data;
                     if (isLike) {
                         var viewResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goodsId + "/like");

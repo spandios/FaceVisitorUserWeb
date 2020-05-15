@@ -212,7 +212,7 @@
                         });
                     }
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                    const userResponse = await axios.get('http://localhost:5001/api/v1/user/me');
+                    const userResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                     this.user = userResponse.data;
                     if (this.user == null) {
                         Swal.fire({
@@ -308,7 +308,7 @@
                             payRequest.lineItems = lineItems;
 
 
-                            axios.post('http://localhost:5001/api/v1/order/pay/multiple', payRequest).then(result => {
+                            axios.post('http://api.facevisitor.co.kr/api/v1/order/pay/multiple', payRequest).then(result => {
 
                                 Swal.fire({text: '결제를 완료했습니다', icon: 'success'}).then(r => {
                                     const data = result.data;
@@ -360,7 +360,7 @@
                 //     }
                 // });
                 // var goods = {};
-                // var {data} = await axios.get('http://localhost:5001/api/v1/goods/' + 1057);
+                // var {data} = await axios.get('http://api.facevisitor.co.kr/api/v1/goods/' + 1057);
                 //
                 // goods.id = data.id;
                 // goods.content = data;
@@ -415,7 +415,7 @@
                                     let errorIndex = vue.errorGoodsId.findIndex(value => value == code.data);
                                     if (index < 0 && errorIndex < 0) {
                                         var goods = {};
-                                        axios.get('http://localhost:5001/api/v1/goods/' + code.data).then(result => {
+                                        axios.get('http://api.facevisitor.co.kr/api/v1/goods/' + code.data).then(result => {
                                             const data = result.data;
                                             goods.id = code.data;
                                             goods.content = data;

@@ -1,22 +1,22 @@
-# face_recog.py
+# Face.py
 
 import base64
 import datetime
 import os
-import requests
 import time
-from Recommend import Recommend
+
 import boto3
-
-boto3.setup_default_session(profile_name='face')
-
 import cv2
 import face_recognition
 import numpy as np
+import pandas as pd
+import requests
 
-import camera
 import aws_rekog
+import camera
+from Recommend import Recommend
 
+boto3.setup_default_session(profile_name='face')
 headers = {'content-type': 'application/json'}
 customerFaceCount = {}
 # customerCountDataFrame = pd.DataFrame(index=['count', 'like', 'start_time', 'end_time'])
@@ -38,6 +38,7 @@ class FaceRecog():
         self.currentFace = None
         self.known_face_encodings = []
         self.known_face_names = []
+        self.countDf = pd.DataFrame(data={"user_name": [], "count": [], "timestamp": []})
 
         # # Load sample pictures and learn how to recognize it.
 
@@ -173,26 +174,20 @@ class FaceRecog():
         process = []
         faceIds = []
         result = {}
-        while count < 1:
-            time.sleep(1)
-            tempFrame = self.camera.get_frame()
-            response = aws_rekog.add_face_to_collection(collection_id, self.get_jpg_bytes())
-            if len(response['UnindexedFaces']) > 0:
-                for unindexedFace in response['UnindexedFaces']:
-                    if len(unindexedFace['Reasons']) > 0:
-                        print(unindexedFace['Reasons'], None)
-            elif len(response['FaceRecords']) > 0:
-                for faceRecord in response['FaceRecords']:
-                    faceId = faceRecord['Face']['FaceId']
-                    faceIds.append(faceId)
-                    faceQuality = faceRecord['FaceDetail']['Quality']
-                    print('  Face ID: ' + faceRecord['Face']['FaceId'])
-                    print(faceRecord['FaceDetail']['Quality'])
-                    process.append([tempFrame, faceQuality['Sharpness'], faceId])
-            else:
-                print("NO_FACE_ERROR", None)
-            count += 1
-
+        tempFrame = self.camera.get_frame()
+        response = aws_rekog.add_face_to_collection(collection_id, self.get_jpg_bytes())
+        if len(response['UnindexedFaces']) > 0:
+            for unindexedFace in response['UnindexedFaces']:
+                if len(unindexedFace['Reasons']) > 0:
+                    print(unindexedFace['Reasons'], None)
+        elif len(response['FaceRecords']) > 0:
+            for faceRecord in response['FaceRecords']:
+                faceId = faceRecord['Face']['FaceId']
+                faceIds.append(faceId)
+                faceQuality = faceRecord['FaceDetail']['Quality']
+                print('  Face ID: ' + faceRecord['Face']['FaceId'])
+                print(faceRecord['FaceDetail']['Quality'])
+                process.append([tempFrame, faceQuality['Sharpness'], faceId])
         # 가장 정확한 얼굴로 사진 캡쳐
         # max(process, key=lambda x: x[1])
         (pictureFrame, sharpness, faeId) = max(process, key=lambda x: x[1])
@@ -256,15 +251,24 @@ class FaceRecog():
                         index = np.argmin(distances)
                         name = self.known_face_names[index]
                         if name in customerFaceCount:
-                            if self.camera.get_second_frame():
-                                customerFaceCount[name]['count'] = customerFaceCount[name]['count'] + 1
-                                customerFaceCount[name]['timestamp'] = self.now()
-                                print("email : " + name)
-                                print("유사성 : " + str(min_value))
-                                print("현재 초 : " + str(time.localtime().tm_sec))
-                                print("카운트 :" + str(customerFaceCount[name]['count']))
+                            customerFaceCount[name]['count'] = customerFaceCount[name]['count'] + 1
+                            customerFaceCount[name]['timestamp'] = self.now()
+                            count = self.countDf.loc[self.countDf['user_name'] == name]["count"].values[0] + 1
+                            self.countDf.at[self.countDf['user_name'] == name, 'count'] = count
+                            self.countDf.at[self.countDf['user_name'] == name, 'timestamp'] = self.now()
 
-                        else: customerFaceCount[name] = {'count': 0, 'like': 0, 'timestamp': self.now()}
+                            print("email : " + name)
+                            print("유사성 : " + str(min_value))
+                            print("현재 초 : " + str(time.localtime().tm_sec))
+                            print("카운트 :" + str(customerFaceCount[name]['count']))
+                            print(self.countDf)
+
+                        else:
+                            newCount = pd.DataFrame(data={"user_name": [name], "count": [0],
+                                                          "timestamp": [datetime.datetime.now()]})
+                            self.countDf.append(newCount)
+                            self.countDf = self.countDf.reset_index(drop=True)
+                            customerFaceCount[name] = {'count': 0, 'like': 0, 'timestamp': self.now()}
 
         self.cal_like()
 
@@ -274,19 +278,18 @@ class FaceRecog():
             count = customerFaceCount[email]['count']
 
             if count is not None and count > 10:
-                response = requests.post('http://localhost:5001/api/v1/user/id',
+                response = requests.post('http://api.facevisitor.co.kr/api/v1/user/id',
                                          json={"email": email},
                                          headers=headers)
-                user_id = response.json()
-                response = requests.get('http://localhost:5001/api/v1/goods/goods-by-category',
-                                         json={"email": email},
-                                         headers=headers)
-                goods_id = response.json()
-                recommend.add_interaction(user_id,goods_id,"face")
-                print("user id : {}가 goods_id : {}에 관심 있습니다(점수10) ".format(user_id,goods_id))
-                customerFaceCount[email]['count'] = 0
-
-
+                if response.status_code == 200:
+                    user_id = response.json()
+                    response = requests.get('http://api.facevisitor.co.kr/api/v1/goods/goods-by-category',
+                                            json={"email": email},
+                                            headers=headers)
+                    goods_id = response.json()
+                    recommend.add_interaction(user_id, goods_id, "face")
+                    print("user id : {}가 goods_id : {}에 관심 있습니다(점수10) ".format(user_id, goods_id))
+                    customerFaceCount[email]['count'] = 0
 
     def login(self):
         faceIds = self.find_face_by_byte('collection_test')

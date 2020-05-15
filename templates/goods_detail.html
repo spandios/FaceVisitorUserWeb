@@ -132,19 +132,19 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                const userResponse = await axios.get('http://localhost:5001/api/v1/user/me');
+                const userResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                 this.user = userResponse.data;
 
                 var viewResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goodsId + "/view");
                 console.log(viewResponse.data);
 
-                var goodsResponse = await axios.get('http://localhost:5001/api/v1/goods/' + this.goodsId);
+                var goodsResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/goods/' + this.goodsId);
                 this.goods = goodsResponse.data;
 
-                var recommendResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend');
+                var recommendResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/goods/init/recommend');
                 this.recommend = recommendResponse.data;
 
-                var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
+                var likeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/like/goods');
                 this.likeGoods = likeResponse.data;
                 if (this.likeGoods.length > 0) {
                     this.likeGoods = this.likeGoods.map(likeGoods => likeGoods.id);
@@ -192,7 +192,7 @@
             },
 
             likeGoodsMethod() {
-                axios.post('http://localhost:5001/api/v1/user/like/goods/' + this.goods.id).then(async result => {
+                axios.post('http://api.facevisitor.co.kr/api/v1/user/like/goods/' + this.goods.id).then(async result => {
                     const isLike = result.data;
                     if (isLike) {
                         var viewResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goodsId + "/like");
@@ -209,7 +209,7 @@
             async addToCart() {
                 await axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + this.goodsId + "/cart");
                 const cart = {goods: this.goods, qty: 1};
-                axios.post('http://localhost:5001/api/v1/cart', cart).then(response => {
+                axios.post('http://api.facevisitor.co.kr/api/v1/cart', cart).then(response => {
                     console.log(response)
                     Swal.fire({
                         text: '장바구니에 추가했어요! 장바구니 목록으로 갈까요?',

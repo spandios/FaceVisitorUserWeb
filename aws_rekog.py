@@ -89,10 +89,9 @@ def deleteFaceById(faceId):
 def deleteAllFace():
     collection_id = 'collection_test'
     faceIds = list_faces_in_collection(collection_id)
-
     for faceId in faceIds:
-        if faceId is 'fd352c7e-75c6-4046-a0ca-e8cd6306ad43' or faceId is '66b308a2-e575-4cdf-b328-65fe63107af9':
-            continue
+        # if faceId is 'fd352c7e-75c6-4046-a0ca-e8cd6306ad43' or faceId is '66b308a2-e575-4cdf-b328-65fe63107af9':
+        #     continue
         deleteFaceById(faceId)
 
 

@@ -1,4 +1,4 @@
-# streaming_web.py
+# application.py
 import atexit
 import json
 
@@ -7,8 +7,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, Response, jsonify, request
 from flask_cors import CORS
 
+import Face
 import aws_personalize as personalize
-import face_recog
 from Recommend import Recommend
 
 collectionId = 'collection_test'
@@ -38,44 +38,44 @@ def make_error(status_code, sub_code, message, action):
     return response
 
 
-app = CustomFlask(__name__)
-cors = CORS(app)
+application = CustomFlask(__name__)
+cors = CORS(application)
 
-faceObject = face_recog.FaceRecog()
+faceObject = Face.FaceRecog()
 recommend = Recommend()
 
 
-@app.route('/')
+@application.route('/')
 def index():
     return render_template('index.html')
 
 
-@app.route('/hello')
+@application.route('/hello')
 def hello():
     return "hello"
 
 
-@app.route('/register')
+@application.route('/register')
 def get_register():
     return render_template('register.html')
 
 
-@app.route('/login')
+@application.route('/login')
 def get_login():
     return render_template('login.html')
 
 
-@app.route('/login_test')
+@application.route('/login_test')
 def get_loin_test():
     return render_template('login_test.html')
 
 
-@app.route('/login', methods=['POST'])
+@application.route('/login', methods=['POST'])
 def post_login():
     try:
         faceId = faceObject.find_face_by_byte(collectionId)
         if len(faceId) > 0:
-            loginResponse = requests.post('http://localhost:5001/api/v1/auth/login', json={"faceId": faceId},
+            loginResponse = requests.post('http://api.facevisitor.co.kr/api/v1/auth/login', json={"faceId": faceId},
                                           headers=headers)
 
             if loginResponse.status_code is 200:
@@ -101,39 +101,42 @@ def gen(fr,is_test = False):
                b'Content-Type: image/jpeg\r\n\r\n' + jpg_bytes + b'\r\n\r\n')
 
 
-@app.route('/video_feed')
+@application.route('/video_feed')
 def video_feed():
     return Response(gen(faceObject), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/video_count')
+
+@application.route('/video_count')
 def video_count():
     return Response(gen(faceObject,is_test=True), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/count_test')
+
+@application.route('/count_test')
 def video_feed_test_template():
     return render_template('count_test.html')
 
-@app.route('/main')
+
+@application.route('/main')
 def get_main():
     return render_template('main.html')
 
 
-@app.route('/goods/all')
+@application.route('/goods/all')
 def get_goods_all():
     return render_template('goods_all.html')
 
 
-@app.route('/goods/<goods_id>')
+@application.route('/goods/<goods_id>')
 def get_goods_detail(goods_id):
     return render_template('goods_detail.html', goods_id=goods_id)
 
 
-@app.route('/self_pay')
+@application.route('/self_pay')
 def get_self_pay():
     return render_template('self_pay.html')
 
 
-@app.route('/recommend/<user_id>/<item_id>/<type>')
+@application.route('/recommend/<user_id>/<item_id>/<type>')
 def add_interaction(user_id, item_id, type):
     user_id = int(user_id)
     item_id = int(item_id)
@@ -142,7 +145,7 @@ def add_interaction(user_id, item_id, type):
     return "true", 200
 
 
-@app.route('/recommend/<user_id>')
+@application.route('/recommend/<user_id>')
 def get_recommend(user_id):
     user_id = int(user_id)
     recommend_goods_id = recommend.get_recommend_by_user_id(user_id)
@@ -150,27 +153,27 @@ def get_recommend(user_id):
 
     if not recommend_goods_id:
         print("empty recommend")
-        popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
+        popResponse = requests.get('http://api.facevisitor.co.kr/api/v1/goods/pop', headers=headers)
 
-        return app.response_class(
+        return application.response_class(
             response=json.dumps(popResponse.json()),
             status=200,
             mimetype='application/json'
         )
     else:
         print("recommend exist")
-        recommend_response = requests.post('http://localhost:5001/api/v1/goods/getGoods',
+        recommend_response = requests.post('http://api.facevisitor.co.kr/api/v1/goods/getGoods',
                                            json={"goodsIds": recommend_goods_id},
                                            headers=headers)
         recommend_result = recommend_response.json()
 
         if 0 < len(recommend_goods_id) < 4:
             print("recommend + pop")
-            popResponse = requests.get('http://localhost:5001/api/v1/goods/pop', headers=headers)
+            popResponse = requests.get('http://api.facevisitor.co.kr/api/v1/goods/pop', headers=headers)
             pop_result = popResponse.json()
             recommend_result.extend(pop_result)
 
-        response = app.response_class(
+        response = application.response_class(
             response=json.dumps(recommend_result),
             status=200,
             mimetype='application/json'
@@ -179,11 +182,11 @@ def get_recommend(user_id):
         return response
 
 
-@app.route('/recommend/pop')
+@application.route('/recommend/pop')
 def get_popularity():
-    loginResponse = requests.post('http://localhost:5001/api/v1/goods/getGoods',
+    loginResponse = requests.post('http://api.facevisitor.co.kr/api/v1/goods/getGoods',
                                   json={"goodsIds": recommend.get_popularity_item_id()}, headers=headers)
-    response = app.response_class(
+    response = application.response_class(
         response=json.dumps(loginResponse.json()),
         status=200,
         mimetype='application/json'
@@ -191,39 +194,39 @@ def get_popularity():
     return response
 
 
-@app.route('/direct_pay/<goods_id>')
+@application.route('/direct_pay/<goods_id>')
 def get_direct_self_pay(goods_id):
     return render_template('direct_pay.html', goods_id=goods_id)
 
 
-@app.route('/order')
+@application.route('/order')
 def get_order_page():
     return render_template('order_page.html')
 
 
-@app.route('/order/complete/<order_id>')
+@application.route('/order/complete/<order_id>')
 def get_pay_complete(order_id):
     return render_template('pay_complete.html', order_id=order_id)
 
 
-@app.route('/cart')
+@application.route('/cart')
 def get_cart():
     return render_template('cart.html')
 
 
-@app.route('/is_face_detected')
+@application.route('/is_face_detected')
 def face_detectd():
     return jsonify(is_face_detected=faceObject.face_detected)
 
 
-@app.route('/is_user')
+@application.route('/is_user')
 def is_user():
     try:
         response = faceObject.find_face_by_byte(collectionId)
         result = response is not None
         if result is True:
             if len(response) > 0:
-                loginResponse = requests.post('http://localhost:5001/api/v1/auth/direct_login',
+                loginResponse = requests.post('http://api.facevisitor.co.kr/api/v1/auth/direct_login',
                                               json={"faceId": response},
                                               headers=headers)
                 if loginResponse.status_code is 200:
@@ -239,12 +242,12 @@ def is_user():
         return "서버에 오류가 있습니다.", 500
 
 
-@app.route('/personalize/<user_id>', methods=['GET'])
+@application.route('/personalize/<user_id>', methods=['GET'])
 def get_personalize(user_id):
     return jsonify(personalize.getRecommendationByWebEvent(user_id))
 
 
-@app.route('/join', methods=['POST'])
+@application.route('/join', methods=['POST'])
 def join():
     try:
         userJson = request.json['user']
@@ -261,7 +264,8 @@ def join():
         # if isMatch is not None:
         #     return "이미 등록된 얼굴입니다. 로그인을 해주세요", 400
 
-        response = requests.post('http://localhost:5001/api/v1/user/exist', json={"email": email}, headers=headers)
+        response = requests.post('http://api.facevisitor.co.kr/api/v1/user/exist', json={"email": email},
+                                 headers=headers)
         exist = response.json()
         if exist:
             return "이미 가입된 이메일입니다.", 400
@@ -272,8 +276,9 @@ def join():
             result = faceObject.add_faces_to_collection(email, 'collection_test')
             print(result)
 
-            response = requests.post('http://localhost:5001/api/v1/auth/join',
-                                     json={"email": email, "password": password, "phone": phone, "name": name,"storeId": storeId,
+            response = requests.post('http://api.facevisitor.co.kr/api/v1/auth/join',
+                                     json={"email": email, "password": password, "phone": phone, "name": name,
+                                           "storeId": storeId,
                                            "faceIds": result['faceIds'], "lowAge": result['faceMeta']['lowAge'],
                                            "highAge": result['faceMeta']['highAge'],
                                            "gender": result['faceMeta']['gender'],
@@ -301,4 +306,4 @@ if __name__ == '__main__':
     scheduler.start()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
-    app.run(host='localhost', debug=True, use_reloader=False)
+    application.run()

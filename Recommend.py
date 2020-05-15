@@ -76,7 +76,6 @@ class Recommend():
             return item_id
         else: return []
     def get_popularity_item_id(self, n=10):
-
         item_list = []
         popularDf = self.df.groupby('item_id').count()
         for i, row in popularDf.iterrows():

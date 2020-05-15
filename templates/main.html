@@ -316,18 +316,18 @@
                     });
                 }
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                var {data} = await axios.get('http://localhost:5001/api/v1/user/me');
+                var {data} = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                 this.user = data;
 
                 await this.getLikeGoods();
 
-                var storeResponse = await axios.get('http://localhost:5001/api/v1/owner/store/' + this.storeId);
+                var storeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/owner/store/' + this.storeId);
                 this.store = storeResponse.data;
 
                 var recommendResponse = await axios.get('http://localhost:5000/recommend/' + this.user.id);
                 console.log(recommendResponse)
                 if (recommendResponse.data.length === 0) {
-                    var personalizeResponse = await axios.get('http://localhost:5001/api/v1/goods/init/recommend/');
+                    var personalizeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/goods/init/recommend/');
                 }
                 this.recommend = recommendResponse.data;
                 this.checkIsLikeForList(this.recommend);
@@ -336,7 +336,7 @@
                 this.best = bestResponse.data;
                 this.checkIsLikeForList(this.best);
 
-                var historyResponse = await axios.get('http://localhost:5001/api/v1/user/history/goods');
+                var historyResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/history/goods');
                 this.history = historyResponse.data;
                 this.checkIsLikeForList(this.history);
 
@@ -354,7 +354,7 @@
                 location.href = "/";
             },
             async search() {
-                const searchResponse = await axios.get('http://localhost:5001/api/v1/goods/search?keyword=' + this.keyword);
+                const searchResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/goods/search?keyword=' + this.keyword);
                 console.log(searchResponse.data)
                 if (searchResponse.data == null || searchResponse.data.length == 0) {
                     alert('앗! 검색결과가 없어요!')
@@ -365,7 +365,7 @@
             },
             async getLikeGoods() {
                 try {
-                    var likeResponse = await axios.get('http://localhost:5001/api/v1/user/like/goods');
+                    var likeResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/like/goods');
                     this.likeGoods = likeResponse.data;
                     console.log(this.likeGoods);
                     if (this.likeGoods.length > 0) {
@@ -400,7 +400,7 @@
                 location.href = "/self_pay"
             },
             likeGoodsMethod(goods) {
-                axios.post('http://localhost:5001/api/v1/user/like/goods/' + goods.id).then(result => {
+                axios.post('http://api.facevisitor.co.kr/api/v1/user/like/goods/' + goods.id).then(result => {
                     const isLike = result.data;
                     if (isLike) {
                         axios.get('http://localhost:5000/recommend/' + this.user.id + "/" + goods.id + "/like").then(likeInter => {

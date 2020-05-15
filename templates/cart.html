@@ -216,7 +216,7 @@
                         });
                     }
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-                    const userResponse = await axios.get('http://localhost:5001/api/v1/user/me');
+                    const userResponse = await axios.get('http://api.facevisitor.co.kr/api/v1/user/me');
                     this.user = userResponse.data;
 
 
@@ -267,7 +267,7 @@
                     location.href = "/";
                 },
                 getCart() {
-                    axios.get('http://localhost:5001/api/v1/cart').then(result => {
+                    axios.get('http://api.facevisitor.co.kr/api/v1/cart').then(result => {
                         this.cart = result.data;
                         console.log(this.cart);
                     }).catch(err => {
@@ -283,7 +283,7 @@
                     return price;
                 },
                 deleteCart(id) {
-                    axios.delete('http://localhost:5001/api/v1/cart/' + id).then(result => {
+                    axios.delete('http://api.facevisitor.co.kr/api/v1/cart/' + id).then(result => {
                         Swal.fire({
                             text: '삭제완료',
                             icon: 'success'
@@ -324,9 +324,9 @@
 
                             payRequest.lineItems = lineItems;
 
-                            axios.post('http://localhost:5001/api/v1/order/pay/multiple', payRequest).then(result => {
+                            axios.post('http://api.facevisitor.co.kr/api/v1/order/pay/multiple', payRequest).then(result => {
                                 Swal.fire({text: '결제를 완료했습니다', icon: 'success'}).then(r => {
-                                    axios.delete('http://localhost:5001/api/v1/cart/all').then(deleteAll => {
+                                    axios.delete('http://api.facevisitor.co.kr/api/v1/cart/all').then(deleteAll => {
                                         const data = result.data;
                                         const order_id = data.id;
                                         location.href = "/order/complete/" + order_id;
