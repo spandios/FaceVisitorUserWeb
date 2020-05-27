@@ -20,7 +20,7 @@ class Recommend():
     def __init__(self):
         self.df = None
         self.train()
-        self.predictions, self.algo = dump.load(file_name)
+        # self.predictions, self.algo = dump.load(file_name)
 
     def all_alo(self):
         self.df = pd.read_csv(csv_name)

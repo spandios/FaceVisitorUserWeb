@@ -28,8 +28,8 @@ client = session.client('rekognition')
 similarity = 0.4
 recommend = Recommend()
 
-class FaceRecog():
 
+class Face():
     def __init__(self):
         # Using OpenCV to capture from device 0. If you have trouble capturing
         # from a webcam, comment the line below out and use a video file
@@ -69,11 +69,10 @@ class FaceRecog():
                     face_encoding = face_recognition.face_encodings(img)[0]
                     self.known_face_encodings.append(face_encoding)
 
-
     def release(self):
         cv2.destroyAllWindows()
 
-    def get_frame(self,is_test = False):
+    def get_frame(self, is_test=False):
         # Grab a single frame of video
         num = 0
         frame = self.camera.get_frame()
@@ -105,10 +104,9 @@ class FaceRecog():
                         # customerFaceCount[name]['count']
                         if is_test:
                             self.face_names.append("like count : {}".format(str(customerFaceCount[name]['count'])))
-                        else :
+                        else:
                             None
                             # self.face_names.append(name)
-
 
         self.process_this_frame = not self.process_this_frame
 
@@ -250,9 +248,9 @@ class FaceRecog():
                     if min_value < similarity:
                         index = np.argmin(distances)
                         name = self.known_face_names[index]
-                        if name in customerFaceCount:
-                            customerFaceCount[name]['count'] = customerFaceCount[name]['count'] + 1
-                            customerFaceCount[name]['timestamp'] = self.now()
+
+                        if len(self.countDf.loc[self.countDf['user_name'] == name]["user_name"].values) > 0:
+
                             count = self.countDf.loc[self.countDf['user_name'] == name]["count"].values[0] + 1
                             self.countDf.at[self.countDf['user_name'] == name, 'count'] = count
                             self.countDf.at[self.countDf['user_name'] == name, 'timestamp'] = self.now()
@@ -260,43 +258,48 @@ class FaceRecog():
                             print("email : " + name)
                             print("유사성 : " + str(min_value))
                             print("현재 초 : " + str(time.localtime().tm_sec))
-                            print("카운트 :" + str(customerFaceCount[name]['count']))
-                            print(self.countDf)
+                            print("카운트 :" + str(count))
+                            # print(self.countDf)
 
                         else:
-                            newCount = pd.DataFrame(data={"user_name": [name], "count": [0],
-                                                          "timestamp": [datetime.datetime.now()]})
-                            self.countDf.append(newCount)
+                            print("init new user")
+                            newCount = pd.DataFrame(
+                                data={"user_name": [name], "count": [1], "timestamp": [datetime.datetime.now()]})
+                            self.countDf = self.countDf.append(newCount)
                             self.countDf = self.countDf.reset_index(drop=True)
-                            customerFaceCount[name] = {'count': 0, 'like': 0, 'timestamp': self.now()}
+                            # customerFaceCount[name] = {'count': 0, 'like': 0, 'timestamp': self.now()}
 
         self.cal_like()
 
-
     def cal_like(self):
-        for email in customerFaceCount:
-            count = customerFaceCount[email]['count']
-
-            if count is not None and count > 10:
-                response = requests.post('http://api.facevisitor.co.kr/api/v1/user/id',
-                                         json={"email": email},
-                                         headers=headers)
+        preferenceFace = self.countDf.loc[self.countDf['count'] > 180]
+        for email in preferenceFace["user_name"].values:
+            response = requests.post('http://api.facevisitor.co.kr/api/v1/user/id',
+                                     json={"email": email},
+                                     headers=headers)
+            if response.status_code == 200:
+                user_id = response.json()
+                print("user_id : {}".format(user_id))
+                response = requests.get('http://api.facevisitor.co.kr/api/v1/goods/goods-by-category', headers=headers)
+                print(response)
                 if response.status_code == 200:
-                    user_id = response.json()
-                    response = requests.get('http://api.facevisitor.co.kr/api/v1/goods/goods-by-category',
-                                            json={"email": email},
-                                            headers=headers)
                     goods_id = response.json()
                     recommend.add_interaction(user_id, goods_id, "face")
                     print("user id : {}가 goods_id : {}에 관심 있습니다(점수10) ".format(user_id, goods_id))
-                    customerFaceCount[email]['count'] = 0
+                    self.countDf.at[self.countDf['user_name'] == email, 'count'] = 0
+                else:
+                    print("error")
+                    self.countDf.at[self.countDf['user_name'] == email, 'count'] = 0
+
+            else:
+                self.countDf.at[self.countDf['user_name'] == email, 'count'] = 0
 
     def login(self):
         faceIds = self.find_face_by_byte('collection_test')
 
 
 if __name__ == '__main__':
-    face_recog = FaceRecog()
+    face_recog = Face()
 
     while True:
         frame = face_recog.get_frame()

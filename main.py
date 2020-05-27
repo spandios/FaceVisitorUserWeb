@@ -90,11 +90,11 @@ def post_login():
 #
 
 
-def gen(fr,is_test = False):
+def gen(fr, is_test=False):
     while True:
-        if is_test :
+        if is_test:
             jpg_bytes = fr.get_jpg_bytes_test()
-        else :
+        else:
             jpg_bytes = fr.get_jpg_bytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + jpg_bytes + b'\r\n\r\n')
@@ -107,7 +107,7 @@ def video_feed():
 
 @app.route('/video_count')
 def video_count():
-    return Response(gen(faceObject,is_test=True), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(faceObject, is_test=True), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/count_test')
@@ -148,7 +148,6 @@ def add_interaction(user_id, item_id, type):
 def get_recommend(user_id):
     user_id = int(user_id)
     recommend_goods_id = recommend.get_recommend_by_user_id(user_id)
-
 
     if not recommend_goods_id:
         print("empty recommend")
@@ -305,4 +304,4 @@ if __name__ == '__main__':
     scheduler.start()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
-    app.run(debug=False)
+    app.run()

@@ -11,6 +11,7 @@ fail_reason = ['EXCEEDS_MAX_FACES', 'EXTREME_POSE', 'LOW_BRIGHTNESS', 'LOW_SHARP
 client = boto3.client('rekognition')
 import aws_s3
 
+
 class VideoCamera(object):
     def __init__(self, videoNum):
         self.video = cv2.VideoCapture(videoNum)
