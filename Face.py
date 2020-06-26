@@ -181,6 +181,7 @@ class Face():
         elif len(response['FaceRecords']) > 0:
             for faceRecord in response['FaceRecords']:
                 faceId = faceRecord['Face']['FaceId']
+                print("faceId : " + faceId)
                 faceIds.append(faceId)
                 faceQuality = faceRecord['FaceDetail']['Quality']
                 print('  Face ID: ' + faceRecord['Face']['FaceId'])
@@ -188,6 +189,7 @@ class Face():
                 process.append([tempFrame, faceQuality['Sharpness'], faceId])
         # 가장 정확한 얼굴로 사진 캡쳐
         # max(process, key=lambda x: x[1])
+
         (pictureFrame, sharpness, faeId) = max(process, key=lambda x: x[1])
         print("가장 정확한 얼굴 모양 데이터 : {}".format(max(process, key=lambda x: x[1])))
         ret, jpg = cv2.imencode('.jpg', pictureFrame)
@@ -255,11 +257,8 @@ class Face():
                             self.countDf.at[self.countDf['user_name'] == name, 'count'] = count
                             self.countDf.at[self.countDf['user_name'] == name, 'timestamp'] = self.now()
 
-                            print("email : " + name)
-                            print("유사성 : " + str(min_value))
-                            print("현재 초 : " + str(time.localtime().tm_sec))
-                            print("카운트 :" + str(count))
-                            # print(self.countDf)
+                            print("email : {}, 현재 초 : {} , 카운트 : {} ".format(name, str(time.localtime().tm_sec),
+                                                                             str(count)))
 
                         else:
                             print("init new user")
@@ -272,7 +271,7 @@ class Face():
         self.cal_like()
 
     def cal_like(self):
-        preferenceFace = self.countDf.loc[self.countDf['count'] > 180]
+        preferenceFace = self.countDf.loc[self.countDf['count'] >= 180]
         for email in preferenceFace["user_name"].values:
             response = requests.post('http://api.facevisitor.co.kr/api/v1/user/id',
                                      json={"email": email},
@@ -281,7 +280,6 @@ class Face():
                 user_id = response.json()
                 print("user_id : {}".format(user_id))
                 response = requests.get('http://api.facevisitor.co.kr/api/v1/goods/goods-by-category', headers=headers)
-                print(response)
                 if response.status_code == 200:
                     goods_id = response.json()
                     recommend.add_interaction(user_id, goods_id, "face")

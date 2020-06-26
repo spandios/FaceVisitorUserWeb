@@ -22,13 +22,14 @@ class Recommend():
         self.train()
         # self.predictions, self.algo = dump.load(file_name)
 
-    def all_alo(self):
+    def checkBestAlgorithm(self):
         self.df = pd.read_csv(csv_name)
         reader = Reader(rating_scale=(1, 10))
         data = Dataset.load_from_df(self.df[['user_id', 'item_id', 'rating']], reader)
         benchmark = []
+        rmseTuple = []
         # 모든 알고리즘을 literate화 시켜서 반복문을 실행시킨다.
-        for algorithm in [SVD(), SVDpp(), SlopeOne(),NormalPredictor(), KNNBaseline(), KNNBasic(),
+        for algorithm in [SVD(), SVDpp(), SlopeOne(), NormalPredictor(), KNNBaseline(), KNNBasic(),
                           KNNWithMeans(),
                           KNNWithZScore(), BaselineOnly(), CoClustering()]:
             # 교차검증을 수행하는 단계.
@@ -36,10 +37,16 @@ class Recommend():
 
             # 결과 저장과 알고리즘 이름 추가.
             tmp = pd.DataFrame.from_dict(results).mean(axis=0)
+            rmseTuple.append((algorithm, tmp['test_rmse']))
             tmp = tmp.append(pd.Series([str(algorithm).split(' ')[0].split('.')[-1]], index=['Algorithm']))
             benchmark.append(tmp)
-
         print(pd.DataFrame(benchmark).set_index('Algorithm').sort_values('test_rmse'))
+        print("\n")
+        rmseTuple.sort(key=lambda x: x[1])
+
+        print("Best algorithm : ")
+        print(str(rmseTuple[0]).split(' ')[0].split('.')[-1])
+        return rmseTuple[0]
 
     def train(self):
         # 점수 1~ 10
@@ -48,6 +55,7 @@ class Recommend():
         data = Dataset.load_from_df(self.df[['user_id', 'item_id', 'rating']], reader)
         # TrainSet
         trainset = data.build_full_trainset()
+        # algo = self.checkBestAlgorithm()[0]
         algo = SVD()
         algo.fit(trainset)
         # TestSet
@@ -74,7 +82,9 @@ class Recommend():
 
             item_id = [result[0] for result in results]
             return item_id
-        else: return []
+        else:
+            return []
+
     def get_popularity_item_id(self, n=10):
         item_list = []
         popularDf = self.df.groupby('item_id').count()
@@ -126,7 +136,7 @@ class Recommend():
 
 if __name__ == '__main__':
     recommend = Recommend()
-    recommend.all_alo()
+    recommend.checkBestAlgorithm()
     # recommend.get_recommend_by_user_id(6, 10)
 
     # recommend.add_interaction(10,2400,"view")

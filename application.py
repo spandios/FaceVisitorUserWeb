@@ -13,6 +13,9 @@ from Recommend import Recommend
 collectionId = 'collection_test'
 headers = {'content-type': 'application/json'}
 
+# url = "http://localhost:5001"
+url = "http://api.facevisitor.co.kr"
+
 
 class CustomFlask(Flask):
     jinja_options = Flask.jinja_options.copy()
@@ -74,9 +77,8 @@ def post_login():
     try:
         faceId = faceObject.find_face_by_byte(collectionId)
         if len(faceId) > 0:
-            loginResponse = requests.post('http://api.facevisitor.co.kr/api/v1/auth/login', json={"faceId": faceId},
+            loginResponse = requests.post(url + '/api/v1/auth/login', json={"faceId": faceId},
                                           headers=headers)
-
             if loginResponse.status_code is 200:
                 return loginResponse.json()
         else:
@@ -90,11 +92,11 @@ def post_login():
 #
 
 
-def gen(fr,is_test = False):
+def gen(fr, is_test=False):
     while True:
-        if is_test :
+        if is_test:
             jpg_bytes = fr.get_jpg_bytes_test()
-        else :
+        else:
             jpg_bytes = fr.get_jpg_bytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + jpg_bytes + b'\r\n\r\n')
@@ -107,7 +109,7 @@ def video_feed():
 
 @app.route('/video_count')
 def video_count():
-    return Response(gen(faceObject,is_test=True), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(faceObject, is_test=True), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/count_test')
@@ -149,10 +151,9 @@ def get_recommend(user_id):
     user_id = int(user_id)
     recommend_goods_id = recommend.get_recommend_by_user_id(user_id)
 
-
     if not recommend_goods_id:
         print("empty recommend")
-        popResponse = requests.get('http://api.facevisitor.co.kr/api/v1/goods/pop', headers=headers)
+        popResponse = requests.get(url + '/api/v1/goods/pop', headers=headers)
 
         return app.response_class(
             response=json.dumps(popResponse.json()),
@@ -161,14 +162,45 @@ def get_recommend(user_id):
         )
     else:
         print("recommend exist")
-        recommend_response = requests.post('http://api.facevisitor.co.kr/api/v1/goods/getGoods',
-                                           json={"goodsIds": recommend_goods_id},
+        recommend_response = requests.post(url + '/api/v1/goods/getGoods',
+                                           json={"goodsIds": recommend_goods_id, "userId": user_id},
                                            headers=headers)
+
         recommend_result = recommend_response.json()
+        face_response = requests.get(url + "/api/v1/user/{}/face".format(user_id), headers=headers)
+        if face_response.status_code == 200:
+            faceMeta = face_response.json()
+            if (faceMeta != None):
+                gender = faceMeta['gender']
+                lowAge = faceMeta['lowAge']
+                highAge = faceMeta['highAge']
+                print(lowAge, highAge)
+                age = str((lowAge + highAge + 10) // 2)
+                ageFormat = age[:-1] + "0"
+                print("유저의 성별 : " + gender)
+                print("유저의 나이대 : " + ageFormat)
+                print('기본 추천 상품 점수\n')
+                for index in range(len(recommend_result)):
+                    goods = recommend_result[index]
+                    goods['score'] = (len(recommend_result) - 1) - index
+                    print("goods id : {} ,  score : {} \n".format(goods['id'], goods['score']))
+                    if goods['gender'] == gender:
+                        goods['score'] = goods['score'] + 0.6
+                    if goods['age'] == ageFormat:
+                        goods['score'] = goods['score'] + 0.6
+
+                # for goods in recommend_result:
+                #     print("성 나이 계산 후 추천 상품 점수 goods id : {} ,  score : {}".format(goods['id'], goods['score']))
+
+                recommend_result.sort(key=lambda x: x['score'], reverse=True)
+        print("\n\n")
+        print("----최종 추천 상품 점수 ----")
+        for goods in recommend_result:
+            print("goods id : {} ,  score : {}\n".format(goods['id'], goods['score']))
 
         if 0 < len(recommend_goods_id) < 4:
             print("recommend + pop")
-            popResponse = requests.get('http://api.facevisitor.co.kr/api/v1/goods/pop', headers=headers)
+            popResponse = requests.get(url + '/api/v1/goods/pop', headers=headers)
             pop_result = popResponse.json()
             recommend_result.extend(pop_result)
 
@@ -183,7 +215,7 @@ def get_recommend(user_id):
 
 @app.route('/recommend/pop')
 def get_popularity():
-    loginResponse = requests.post('http://api.facevisitor.co.kr/api/v1/goods/getGoods',
+    loginResponse = requests.post(url + '/api/v1/goods/getGoods',
                                   json={"goodsIds": recommend.get_popularity_item_id()}, headers=headers)
     response = app.response_class(
         response=json.dumps(loginResponse.json()),
@@ -225,7 +257,7 @@ def is_user():
         result = response is not None
         if result is True:
             if len(response) > 0:
-                loginResponse = requests.post('http://api.facevisitor.co.kr/api/v1/auth/direct_login',
+                loginResponse = requests.post(url + '/api/v1/auth/direct_login',
                                               json={"faceId": response},
                                               headers=headers)
                 if loginResponse.status_code is 200:
@@ -263,7 +295,7 @@ def join():
         # if isMatch is not None:
         #     return "이미 등록된 얼굴입니다. 로그인을 해주세요", 400
 
-        response = requests.post('http://api.facevisitor.co.kr/api/v1/user/exist', json={"email": email},
+        response = requests.post(url + '/api/v1/user/exist', json={"email": email},
                                  headers=headers)
         exist = response.json()
         if exist:
@@ -275,7 +307,7 @@ def join():
             result = faceObject.add_faces_to_collection(email, 'collection_test')
             print(result)
 
-            response = requests.post('http://api.facevisitor.co.kr/api/v1/auth/join',
+            response = requests.post(url + '/api/v1/auth/join',
                                      json={"email": email, "password": password, "phone": phone, "name": name,
                                            "storeId": storeId,
                                            "faceIds": result['faceIds'], "lowAge": result['faceMeta']['lowAge'],
